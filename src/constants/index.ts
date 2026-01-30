@@ -4,6 +4,9 @@ export const ROUTES = {
 	LOGIN: "/login",
 	ADMIN_DASHBOARD: "/admin",
 	SUBADMIN_DASHBOARD: "/subadmin",
+	ADMIN_AI_DOUBT_DETAIL: "/admin/ai/doubt-detail",
+	ADMIN_AI_REVIEW: "/admin/ai/review",
+	ADMIN_DOUBTS: "/admin/doubts",
 } as const;
 
 export const API_BASE_URL = "https://sisyaclass.xyz";

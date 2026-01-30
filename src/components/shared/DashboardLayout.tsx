@@ -1,15 +1,22 @@
 import {
 	IconArrowLeft,
+	IconChevronDown,
+	IconRobot,
 	IconBrandTabler,
 	IconChartBar,
+	IconLayoutDashboard,
+	IconMessageCircle,
 	IconSettings,
 	IconUsers,
 } from "@tabler/icons-react";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { APP_NAME, ROUTES } from "@/constants";
+import { sidebarConfig } from "@/constants/sidebar";
 import { cn } from "@/lib/utils";
-import { Sidebar, SidebarBody, SidebarLink } from "../ui/sidebar";
+import { useAuthStore } from "@/store/useAuthStore";
+import { Sidebar, SidebarBody, SidebarLink, useSidebar } from "../ui/sidebar";
+import type { SidebarIconName, SidebarItemMapped, SidebarSubItem } from "@/types/sidebar";
 
 interface DashboardLayoutProps {
 	children: React.ReactNode;
@@ -18,66 +25,147 @@ interface DashboardLayoutProps {
 	userAvatar?: string;
 }
 
+const getIcon = (name: SidebarIconName) => {
+	const props = { className: "h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" };
+	switch (name) {
+		case "Bot":
+			return <IconRobot {...props} />;
+		case "MessageCircle":
+			return <IconMessageCircle {...props} />;
+		case "LayoutDashboard":
+			return <IconLayoutDashboard {...props} />;
+		case "Settings":
+			return <IconSettings {...props} />;
+		case "Users":
+			return <IconUsers {...props} />;
+		case "ChartBar":
+			return <IconChartBar {...props} />;
+		case "LogOut":
+			return <IconArrowLeft {...props} />;
+		default:
+			return <IconBrandTabler {...props} />;
+	}
+};
+
+const NavItem = ({ link }: { link: SidebarItemMapped }) => {
+	const [isExpanded, setIsExpanded] = useState(false);
+	const { open: sidebarOpen } = useSidebar();
+
+	if (!link.subItems || link.subItems.length === 0) {
+		return <SidebarLink link={link} />;
+	}
+
+	return (
+		// biome-ignore lint/a11y/noStaticElementInteractions: <design requirment to expand on hover>
+		<div
+			className="flex flex-col"
+			onMouseEnter={() => sidebarOpen && setIsExpanded(true)}
+			onMouseLeave={() => sidebarOpen && setIsExpanded(false)}
+		>
+			<button
+				type="button"
+				onClick={() => sidebarOpen && setIsExpanded(!isExpanded)}
+				className={cn(
+					"flex items-center justify-between gap-2 group/sidebar py-2 px-0 w-full hover:cursor-pointer bg-transparent border-none",
+				)}
+			>
+				<div className="flex items-center gap-2">
+					{link.icon}
+					<motion.span
+						animate={{
+							display: sidebarOpen ? "inline-block" : "none",
+							opacity: sidebarOpen ? 1 : 0,
+						}}
+						className="text-neutral-700 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block p-0! m-0!"
+					>
+						{link.label}
+					</motion.span>
+				</div>
+				{sidebarOpen && (
+					<motion.div
+						animate={{ rotate: isExpanded ? 180 : 0 }}
+						className="text-neutral-500 dark:text-neutral-400 mr-2"
+					>
+						<IconChevronDown className="h-4 w-4" />
+					</motion.div>
+				)}
+			</button>
+
+			<AnimatePresence>
+				{sidebarOpen && isExpanded && (
+					<motion.div
+						initial={{ height: 0, opacity: 0 }}
+						animate={{ height: "auto", opacity: 1 }}
+						exit={{ height: 0, opacity: 0 }}
+						className="flex flex-col gap-1 pl-7 overflow-hidden"
+					>
+						{link.subItems.map((sub: SidebarSubItem, idx: number) => (
+							<SidebarLink
+								// biome-ignore lint/suspicious/noArrayIndexKey: <static the index will not change>
+								key={idx}
+								link={{
+									label: sub.label,
+									href: sub.path,
+									icon: (
+										<div className="w-1.5 h-1.5 rounded-full bg-neutral-400 dark:bg-neutral-500 shrink-0" />
+									),
+								}}
+								className="py-1.5 opacity-80 hover:opacity-100"
+							/>
+						))}
+					</motion.div>
+				)}
+			</AnimatePresence>
+		</div>
+	);
+};
+
 export function DashboardLayout({
 	children,
 	actor,
 	userName = "User",
 	userAvatar,
 }: DashboardLayoutProps) {
-	// Define navigation links based on actor role
-	const adminLinks = [
-		{
-			label: "Dashboard",
-			href: ROUTES.ADMIN_DASHBOARD,
-			icon: <IconBrandTabler className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />,
-		},
-		{
-			label: "Analytics",
-			href: `${ROUTES.ADMIN_DASHBOARD}/analytics`,
-			icon: <IconChartBar className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />,
-		},
-		{
-			label: "Users",
-			href: `${ROUTES.ADMIN_DASHBOARD}/users`,
-			icon: <IconUsers className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />,
-		},
-		{
-			label: "Settings",
-			href: `${ROUTES.ADMIN_DASHBOARD}/settings`,
-			icon: <IconSettings className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />,
-		},
-		{
-			label: "Logout",
-			href: ROUTES.LOGIN,
-			icon: <IconArrowLeft className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />,
-		},
-	];
-
-	const subadminLinks = [
-		{
-			label: "Dashboard",
-			href: ROUTES.SUBADMIN_DASHBOARD,
-			icon: <IconBrandTabler className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />,
-		},
-		{
-			label: "Analytics",
-			href: `${ROUTES.SUBADMIN_DASHBOARD}/analytics`,
-			icon: <IconChartBar className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />,
-		},
-		{
-			label: "Settings",
-			href: `${ROUTES.SUBADMIN_DASHBOARD}/settings`,
-			icon: <IconSettings className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />,
-		},
-		{
-			label: "Logout",
-			href: ROUTES.LOGIN,
-			icon: <IconArrowLeft className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />,
-		},
-	];
-
-	const links = actor === "admin" ? adminLinks : subadminLinks;
+	const { analyticsPermissions } = useAuthStore();
 	const [open, setOpen] = useState(false);
+
+	// Filtering logic
+	const filteredLinks: SidebarItemMapped[] = sidebarConfig
+		.filter((item) => {
+			// Role check
+			if (!item.roles.includes(actor)) return false;
+
+			// Permission check for subadmin
+			if (actor === "subadmin" && item.permissionKey) {
+				const hasPermission = analyticsPermissions?.[item.permissionKey];
+				if (!hasPermission) return false;
+			}
+
+			return true;
+		})
+		.map((item) => {
+			// If it's the dashboard link, handle redirect to actor-specific dashboard if path is generic
+			let href = item.path || "#";
+			if (item.label === "Dashboard") {
+				href = actor === "admin" ? ROUTES.ADMIN_DASHBOARD : ROUTES.SUBADMIN_DASHBOARD;
+			}
+
+			// Filter sub-items if they exist
+			let subItems = item.subItems;
+			if (subItems && actor === "subadmin") {
+				subItems = subItems.filter((sub) => {
+					if (!sub.permissionKey) return true;
+					return analyticsPermissions?.[sub.permissionKey];
+				});
+			}
+
+			return {
+				...item,
+				href,
+				icon: getIcon(item.icon),
+				subItems,
+			};
+		});
 
 	return (
 		<div
@@ -90,9 +178,9 @@ export function DashboardLayout({
 					<div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
 						{open ? <Logo /> : <LogoIcon />}
 						<div className="mt-6 flex flex-col gap-2">
-							{links.map((link, idx) => (
+							{filteredLinks.map((link, idx) => (
 								// biome-ignore lint/suspicious/noArrayIndexKey: <array-index-key>
-								<SidebarLink key={idx} link={link} />
+								<NavItem key={idx} link={link} />
 							))}
 						</div>
 					</div>

@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
 import type { SidebarItemMapped, SidebarSubItem } from "@/types/sidebar";
 import { Sidebar, SidebarBody, SidebarLink, useSidebar } from "../ui/sidebar";
+import { ThemeToggle } from "./ThemeToggle";
 
 interface DashboardLayoutProps {
 	children: React.ReactNode;
@@ -94,7 +95,7 @@ export function DashboardLayout({
 	userName = "User",
 	userAvatar,
 }: DashboardLayoutProps) {
-	const { analyticsPermissions } = useAuthStore();
+	const { analyticsPermissions, logout } = useAuthStore();
 	const [open, setOpen] = useState(false);
 
 	// Filtering logic
@@ -134,6 +135,7 @@ export function DashboardLayout({
 				href,
 				icon: <Icon className="h-5 w-5 shrink-0" />,
 				subItems,
+				onClick: item.label === "Logout" ? logout : item.onClick,
 			};
 		});
 
@@ -154,7 +156,8 @@ export function DashboardLayout({
 							))}
 						</div>
 					</div>
-					<div>
+					<div className="flex flex-col gap-2">
+						<ThemeToggle />
 						<SidebarLink
 							link={{
 								label: userName,

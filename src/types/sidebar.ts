@@ -5,6 +5,7 @@ export interface SidebarLinkItem {
 	label: string;
 	href: string;
 	icon: ReactNode;
+	onClick?: () => void;
 }
 
 export type SidebarSubItem = {
@@ -21,6 +22,7 @@ export type SidebarNavItem = {
 	expandable?: boolean;
 	path?: string;
 	subItems?: SidebarSubItem[];
+	onClick?: () => void;
 };
 
 export type SidebarItemMapped = Omit<SidebarNavItem, "icon"> & SidebarLinkItem;

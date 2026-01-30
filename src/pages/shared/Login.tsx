@@ -66,9 +66,9 @@ export default function Login() {
 	const handleBlur = () => setFocusedField(null);
 
 	return (
-		<div className="h-screen flex flex-col lg:flex-row overflow-hidden bg-gray-50">
+		<div className="h-screen flex flex-col lg:flex-row overflow-hidden bg-gray-50 dark:bg-neutral-950 transition-colors duration-300">
 			{/* Left Side - Branding with DomeGallery */}
-			<div className="hidden lg:flex lg:w-1/2 bg-linear-to-br from-[#1e3a5f] via-[#2563eb] to-[#2c5282] relative overflow-hidden">
+			<div className="hidden lg:flex lg:w-1/2 bg-linear-to-br from-[#1e3a5f] via-[#2563eb] to-[#2c5282] relative overflow-hidden dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900">
 				<div className="absolute inset-0 z-10 h-full w-full">
 					<DomeGallery
 						fit={1}
@@ -83,7 +83,7 @@ export default function Login() {
 			</div>
 
 			{/* Mobile Header - Branding */}
-			<div className="lg:hidden bg-linear-to-br from-[#1e3a5f] to-[#2c5282] px-6 py-4 text-white shadow-lg">
+			<div className="lg:hidden bg-linear-to-br from-[#1e3a5f] to-[#2c5282] px-6 py-4 text-white shadow-lg dark:from-neutral-900 dark:to-neutral-800">
 				<div className="flex items-center gap-2">
 					<div className="bg-white/20 p-2 rounded-lg backdrop-blur-sm">
 						<GraduationCap className="w-5 h-5" />
@@ -93,7 +93,7 @@ export default function Login() {
 			</div>
 
 			{/* Right Side - Login Form */}
-			<div className="flex-1 flex items-center justify-center bg-linear-to-br from-gray-50 via-white to-gray-50 p-4 sm:p-10">
+			<div className="flex-1 flex items-center justify-center bg-linear-to-br from-gray-50 via-white to-gray-50 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950 p-4 sm:p-10 transition-colors duration-300">
 				<motion.div
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
@@ -102,22 +102,24 @@ export default function Login() {
 				>
 					<div className="space-y-6">
 						<div>
-							<h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 bg-linear-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+							<h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2 bg-linear-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-400 bg-clip-text">
 								Welcome back!
 							</h2>
-							<p className="text-gray-600 text-sm sm:text-base">
+							<p className="text-gray-600 dark:text-neutral-400 text-sm sm:text-base">
 								Please log in to your dashboard to continue.
 							</p>
 						</div>
 
 						{/* Role Selection */}
 						<div className="space-y-3">
-							<div className="text-sm font-medium text-gray-700">I am logging in as:</div>
-							<div className="relative flex gap-2 bg-gray-100 p-1 rounded-xl">
+							<div className="text-sm font-medium text-gray-700 dark:text-neutral-300">
+								I am logging in as:
+							</div>
+							<div className="relative flex gap-2 bg-gray-100 dark:bg-neutral-800 p-1 rounded-xl">
 								<motion.div
 									layout
 									className={cn(
-										"absolute top-1 bottom-1 rounded-lg bg-white shadow-md transition-all duration-300 ease-out",
+										"absolute top-1 bottom-1 rounded-lg bg-white dark:bg-neutral-700 shadow-md transition-all duration-300 ease-out",
 										role === "admin"
 											? "left-1 w-[calc(50%-0.25rem)]"
 											: "left-[calc(50%+0.25rem)] w-[calc(50%-0.25rem)]",
@@ -134,7 +136,7 @@ export default function Login() {
 										"relative flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium text-sm sm:text-base transition-all duration-300 z-10",
 										role === "admin"
 											? "text-primary font-semibold"
-											: "text-gray-600 hover:text-gray-900",
+											: "text-gray-600 dark:text-neutral-400 hover:text-gray-900 dark:hover:text-neutral-200",
 									)}
 								>
 									<Shield
@@ -155,7 +157,7 @@ export default function Login() {
 										"relative flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium text-sm sm:text-base transition-all duration-300 z-10",
 										role === "subadmin"
 											? "text-primary font-semibold"
-											: "text-gray-600 hover:text-gray-900",
+											: "text-gray-600 dark:text-neutral-400 hover:text-gray-900 dark:hover:text-neutral-200",
 									)}
 								>
 									<User
@@ -180,7 +182,10 @@ export default function Login() {
 								}}
 								transition={{ duration: 0.2 }}
 							>
-								<label htmlFor="userId" className="block text-sm font-medium text-gray-700">
+								<label
+									htmlFor="userId"
+									className="block text-sm font-medium text-gray-700 dark:text-neutral-300"
+								>
 									{role === "admin" ? "User ID" : "Email"}
 								</label>
 								<div className="relative group">
@@ -190,7 +195,8 @@ export default function Login() {
 										placeholder={role === "admin" ? "Enter ID" : "Enter Email"}
 										className={cn(
 											"pl-4 pr-10 sm:pr-12 h-11 sm:h-12 text-sm sm:text-base transition-all duration-300",
-											"border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20",
+											"bg-white dark:bg-neutral-900 border-gray-200 dark:border-neutral-800 text-gray-900 dark:text-white",
+											"focus:border-primary focus:ring-2 focus:ring-primary/20",
 											errors.userId &&
 												"border-destructive focus:border-destructive focus:ring-destructive/20",
 											focusedField === "userId" && "shadow-lg shadow-primary/10",
@@ -203,7 +209,7 @@ export default function Login() {
 									/>
 									<div
 										className={cn(
-											"absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none transition-all duration-300",
+											"absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 transition-all duration-300 px-1 pointer-events-none",
 											focusedField === "userId" && "text-primary scale-110",
 										)}
 									>
@@ -224,7 +230,10 @@ export default function Login() {
 								}}
 								transition={{ duration: 0.2 }}
 							>
-								<label htmlFor="password" className="block text-sm font-medium text-gray-700">
+								<label
+									htmlFor="password"
+									className="block text-sm font-medium text-gray-700 dark:text-neutral-300"
+								>
 									Password
 								</label>
 								<div className="relative group">
@@ -234,7 +243,8 @@ export default function Login() {
 										placeholder="Enter Password"
 										className={cn(
 											"pl-4 pr-12 h-11 sm:h-12 text-sm sm:text-base transition-all duration-300",
-											"border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20",
+											"bg-white dark:bg-neutral-900 border-gray-200 dark:border-neutral-800 text-gray-900 dark:text-white",
+											"focus:border-primary focus:ring-2 focus:ring-primary/20",
 											errors.password &&
 												"border-destructive focus:border-destructive focus:ring-destructive/20",
 											focusedField === "password" && "shadow-lg shadow-primary/10",
@@ -249,7 +259,7 @@ export default function Login() {
 										type="button"
 										onClick={() => setShowPassword(!showPassword)}
 										className={cn(
-											"absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none transition-all duration-300 rounded p-1 hover:bg-gray-100",
+											"absolute right-1 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 focus:outline-none transition-all duration-300 rounded p-2 hover:bg-gray-100 dark:hover:bg-neutral-800",
 											focusedField === "password" && "text-primary",
 										)}
 										disabled={isLoading}
@@ -293,7 +303,7 @@ export default function Login() {
 									className={cn(
 										"w-full h-12 text-base font-semibold mt-6 relative overflow-hidden group hover:cursor-pointer",
 										"shadow-md hover:shadow-lg transition-all duration-300",
-										"bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary",
+										"bg-linear-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary",
 										"transform hover:scale-[1.01] active:scale-[0.98]",
 									)}
 									disabled={isLoading}

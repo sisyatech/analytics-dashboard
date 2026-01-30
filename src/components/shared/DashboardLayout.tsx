@@ -101,17 +101,19 @@ export function DashboardLayout({
 	// Filtering logic
 	const filteredLinks: SidebarItemMapped[] = sidebarConfig
 		.filter((item) => {
-			// Role check
-			if (!item.roles.includes(actor)) return false;
+			// Role check: If role is explicitly allowed, proceed
+			const isRoleAllowed = item.roles.includes(actor);
 
-			// Permission check for subadmin
+			// Permission check for subadmin:
+			// If subadmin has the permissionKey, show it even if "subadmin" isn't in roles
 			if (actor === "subadmin" && item.permissionKey) {
-				const hasPermission = analyticsPermissions?.[item.permissionKey];
-				if (!hasPermission) return false;
+				return !!analyticsPermissions?.[item.permissionKey];
 			}
 
-			return true;
+			// Fallback to role check
+			return isRoleAllowed;
 		})
+
 		.map((item) => {
 			// If it's the dashboard link, handle redirect to actor-specific dashboard if path is generic
 			let href = item.path || "#";

@@ -4,8 +4,9 @@ import { ProtectedRoute } from "@/components/shared/ProtectedRoute";
 import { ROUTES } from "@/constants";
 import { useAutoLogout } from "@/hooks/useAutoLogout";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
-// import AIDoubtDetail from "@/pages/admin/AI/AIDoubtDetail";
-// import AIReview from "@/pages/admin/AI/AIReview";
+import AIDoubtDetail from "@/pages/admin/AI/AIDoubtDetail";
+import AIReview from "@/pages/admin/AI/AIReview";
+
 import AttendancePage from "@/pages/admin/Attendance";
 import Login from "@/pages/shared/Login";
 import NotFound from "@/pages/shared/NotFound";
@@ -24,7 +25,7 @@ const AppRoutes = () => {
 				<Route
 					path={ROUTES.ADMIN_DASHBOARD}
 					element={
-						<ProtectedRoute allowedRoles={["admin"]}>
+						<ProtectedRoute roles={["admin"]}>
 							<AdminDashboard />
 						</ProtectedRoute>
 					}
@@ -32,7 +33,7 @@ const AppRoutes = () => {
 				<Route
 					path={ROUTES.SUBADMIN_DASHBOARD}
 					element={
-						<ProtectedRoute allowedRoles={["subadmin"]}>
+						<ProtectedRoute roles={["subadmin"]}>
 							<SubadminDashboard />
 						</ProtectedRoute>
 					}
@@ -40,27 +41,28 @@ const AppRoutes = () => {
 				<Route
 					path={ROUTES.ATTENDANCE}
 					element={
-						<ProtectedRoute allowedRoles={["admin"]}>
+						<ProtectedRoute roles={["admin", "subadmin"]} permissionKey="attendance_access">
 							<AttendancePage />
 						</ProtectedRoute>
 					}
 				/>
-				{/* <Route
-                    path={ROUTES.ADMIN_AI_DOUBT_DETAIL}
-                    element={
-                        <ProtectedRoute allowedRoles={["admin"]}>
-                            <AIDoubtDetail />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path={ROUTES.ADMIN_AI_REVIEW}
-                    element={
-                        <ProtectedRoute allowedRoles={["admin"]}>
-                            <AIReview />
-                        </ProtectedRoute>
-                    }
-                /> */}
+
+				<Route
+					path={ROUTES.ADMIN_AI_DOUBT_DETAIL}
+					element={
+						<ProtectedRoute roles={["admin", "subadmin"]} permissionKey="ai_doubt_detail">
+							<AIDoubtDetail />
+						</ProtectedRoute>
+					}
+				/>
+				<Route
+					path={ROUTES.ADMIN_AI_REVIEW}
+					element={
+						<ProtectedRoute roles={["admin", "subadmin"]} permissionKey="ai_review">
+							<AIReview />
+						</ProtectedRoute>
+					}
+				/>
 
 				{/* 404 Route */}
 				<Route path="*" element={<NotFound />} />

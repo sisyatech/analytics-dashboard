@@ -5,20 +5,29 @@ import { useAuthStore } from "@/store/useAuthStore";
 
 interface ProtectedRouteProps {
 	children: ReactNode;
-	allowedRoles?: ("admin" | "subadmin")[];
+	roles?: ("admin" | "subadmin")[];
+	permissionKey?: string;
 }
 
-export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
-	const { isAuthenticated, role } = useAuthStore();
+export const ProtectedRoute = ({ children, roles, permissionKey }: ProtectedRouteProps) => {
+	const { isAuthenticated, role, analyticsPermissions } = useAuthStore();
 	const location = useLocation();
 
 	if (!isAuthenticated) {
 		return <Navigate to={ROUTES.LOGIN} state={{ from: location }} replace />;
 	}
 
-	if (allowedRoles && role && !allowedRoles.includes(role)) {
+	// Dynamic Permission check for subadmins
+	if (role === "subadmin" && permissionKey) {
+		const hasPermission = analyticsPermissions?.[permissionKey];
+		if (!hasPermission) {
+			return <Navigate to={ROUTES.SUBADMIN_DASHBOARD} replace />;
+		}
+		return <>{children}</>;
+	}
+
+	if (roles && role && !roles.includes(role)) {
 		// Redirect to appropriate dashboard based on actual role
-		// or login if role is somehow invalid
 		return (
 			<Navigate
 				to={role === "admin" ? ROUTES.ADMIN_DASHBOARD : ROUTES.SUBADMIN_DASHBOARD}

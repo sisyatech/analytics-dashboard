@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ElementType, ReactNode } from "react";
 import type { UserRole } from "@/types/auth";
 
 export interface SidebarLinkItem {
@@ -6,15 +6,6 @@ export interface SidebarLinkItem {
 	href: string;
 	icon: ReactNode;
 }
-
-export type SidebarIconName =
-	| "Bot"
-	| "MessageCircle"
-	| "LayoutDashboard"
-	| "Settings"
-	| "Users"
-	| "ChartBar"
-	| "LogOut";
 
 export type SidebarSubItem = {
 	label: string;
@@ -24,7 +15,7 @@ export type SidebarSubItem = {
 
 export type SidebarNavItem = {
 	label: string;
-	icon: SidebarIconName;
+	icon: ElementType;
 	roles: UserRole[];
 	permissionKey?: string;
 	expandable?: boolean;

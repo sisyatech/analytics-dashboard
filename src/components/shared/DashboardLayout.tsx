@@ -1,21 +1,11 @@
-import {
-	IconArrowLeft,
-	IconBrandTabler,
-	IconChartBar,
-	IconChevronDown,
-	IconLayoutDashboard,
-	IconMessageCircle,
-	IconRobot,
-	IconSettings,
-	IconUsers,
-} from "@tabler/icons-react";
+import { IconChevronDown } from "@tabler/icons-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { APP_NAME, ROUTES } from "@/constants";
 import { sidebarConfig } from "@/constants/sidebar";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
-import type { SidebarIconName, SidebarItemMapped, SidebarSubItem } from "@/types/sidebar";
+import type { SidebarItemMapped, SidebarSubItem } from "@/types/sidebar";
 import { Sidebar, SidebarBody, SidebarLink, useSidebar } from "../ui/sidebar";
 
 interface DashboardLayoutProps {
@@ -24,28 +14,6 @@ interface DashboardLayoutProps {
 	userName?: string;
 	userAvatar?: string;
 }
-
-const getIcon = (name: SidebarIconName) => {
-	const props = { className: "h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" };
-	switch (name) {
-		case "Bot":
-			return <IconRobot {...props} />;
-		case "MessageCircle":
-			return <IconMessageCircle {...props} />;
-		case "LayoutDashboard":
-			return <IconLayoutDashboard {...props} />;
-		case "Settings":
-			return <IconSettings {...props} />;
-		case "Users":
-			return <IconUsers {...props} />;
-		case "ChartBar":
-			return <IconChartBar {...props} />;
-		case "LogOut":
-			return <IconArrowLeft {...props} />;
-		default:
-			return <IconBrandTabler {...props} />;
-	}
-};
 
 const NavItem = ({ link }: { link: SidebarItemMapped }) => {
 	const [isExpanded, setIsExpanded] = useState(false);
@@ -69,14 +37,14 @@ const NavItem = ({ link }: { link: SidebarItemMapped }) => {
 					"flex items-center justify-between gap-2 group/sidebar py-2 px-0 w-full hover:cursor-pointer bg-transparent border-none",
 				)}
 			>
-				<div className="flex items-center gap-2">
+				<div className="flex items-center gap-2 text-neutral-700 dark:text-neutral-200">
 					{link.icon}
 					<motion.span
 						animate={{
 							display: sidebarOpen ? "inline-block" : "none",
 							opacity: sidebarOpen ? 1 : 0,
 						}}
-						className="text-neutral-700 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block p-0! m-0!"
+						className="text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block p-0! m-0!"
 					>
 						{link.label}
 					</motion.span>
@@ -159,10 +127,12 @@ export function DashboardLayout({
 				});
 			}
 
+			const Icon = item.icon;
+
 			return {
 				...item,
 				href,
-				icon: getIcon(item.icon),
+				icon: <Icon className="h-5 w-5 shrink-0" />,
 				subItems,
 			};
 		});

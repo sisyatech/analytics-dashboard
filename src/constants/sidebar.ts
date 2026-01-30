@@ -1,16 +1,17 @@
+import * as Icons from "@tabler/icons-react";
 import { ROUTES } from "@/constants/index";
 import type { SidebarNavItem } from "@/types/sidebar";
 
 export const sidebarConfig: SidebarNavItem[] = [
 	{
 		label: "Dashboard",
-		icon: "LayoutDashboard",
+		icon: Icons.IconLayoutDashboard,
 		roles: ["admin", "subadmin"],
 		path: ROUTES.ADMIN_DASHBOARD, // Will be handled dynamically in filtering
 	},
 	{
 		label: "AI",
-		icon: "Bot",
+		icon: Icons.IconRobot,
 		roles: ["admin", "subadmin"],
 		permissionKey: "ai_access", // Example permission key
 		expandable: true,
@@ -25,26 +26,26 @@ export const sidebarConfig: SidebarNavItem[] = [
 	},
 	{
 		label: "Doubts",
-		icon: "MessageCircle",
+		icon: Icons.IconMessageCircle,
 		roles: ["admin", "subadmin"],
 		permissionKey: "doubts_access",
 		path: ROUTES.ADMIN_DOUBTS,
 	},
 	{
 		label: "Users",
-		icon: "Users",
+		icon: Icons.IconUsers,
 		roles: ["admin"],
 		path: "/admin/users",
 	},
 	{
 		label: "Settings",
-		icon: "Settings",
+		icon: Icons.IconSettings,
 		roles: ["admin", "subadmin"],
 		path: "/settings",
 	},
 	{
 		label: "Logout",
-		icon: "LogOut",
+		icon: Icons.IconArrowLeft,
 		roles: ["admin", "subadmin"],
 		path: ROUTES.LOGIN,
 	},

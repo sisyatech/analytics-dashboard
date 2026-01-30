@@ -3,10 +3,9 @@
 import { IconMenu2, IconX } from "@tabler/icons-react";
 import { AnimatePresence, motion } from "motion/react";
 import React, { createContext, useContext, useState } from "react";
-import { cn } from "@/lib/utils";
 import { Link } from "react-router";
+import { cn } from "@/lib/utils";
 import type { SidebarLinkItem } from "@/types/sidebar";
-
 
 interface SidebarContextProps {
 	open: boolean;
@@ -146,7 +145,14 @@ export const MobileSidebar = ({ className, children, ...props }: React.Component
 	);
 };
 
-export const SidebarLink = ({ link, className, ...props }: { link: SidebarLinkItem; className?: string }) => {
+export const SidebarLink = ({
+	link,
+	className,
+	...props
+}: {
+	link: SidebarLinkItem;
+	className?: string;
+}) => {
 	const { open, animate } = useSidebar();
 	return (
 		<Link

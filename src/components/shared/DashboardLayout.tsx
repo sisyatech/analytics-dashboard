@@ -1,11 +1,11 @@
 import {
 	IconArrowLeft,
-	IconChevronDown,
-	IconRobot,
 	IconBrandTabler,
 	IconChartBar,
+	IconChevronDown,
 	IconLayoutDashboard,
 	IconMessageCircle,
+	IconRobot,
 	IconSettings,
 	IconUsers,
 } from "@tabler/icons-react";
@@ -15,8 +15,8 @@ import { APP_NAME, ROUTES } from "@/constants";
 import { sidebarConfig } from "@/constants/sidebar";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
-import { Sidebar, SidebarBody, SidebarLink, useSidebar } from "../ui/sidebar";
 import type { SidebarIconName, SidebarItemMapped, SidebarSubItem } from "@/types/sidebar";
+import { Sidebar, SidebarBody, SidebarLink, useSidebar } from "../ui/sidebar";
 
 interface DashboardLayoutProps {
 	children: React.ReactNode;

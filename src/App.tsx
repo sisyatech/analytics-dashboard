@@ -5,7 +5,7 @@ import AppRoutes from "@/routes/AppRoutes";
 const App = () => {
 	return (
 		<BrowserRouter>
-			<ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+			<ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
 				<AppRoutes />
 			</ThemeProvider>
 		</BrowserRouter>

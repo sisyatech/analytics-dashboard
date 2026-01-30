@@ -17,4 +17,7 @@ export const API_BASE_URL = "https://sisyaclass.xyz";
 export const API_ENDPOINTS = {
 	ADMIN_LOGIN: "/rkadmin/login",
 	SUBADMIN_LOGIN: "/rkadmin/subadmin_login",
+	GET_COURSES_BY_GRADE: "/rkadmin/get_course_by_grade",
+	GET_COMPLETED_SESSIONS: "/rkadmin/get_completed_session",
+	GET_SESSION_ATTENDANCE: "/rkadmin/get_session_attendance",
 } as const;

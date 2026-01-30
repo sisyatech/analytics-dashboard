@@ -4,6 +4,9 @@ import { ProtectedRoute } from "@/components/shared/ProtectedRoute";
 import { ROUTES } from "@/constants";
 import { useAutoLogout } from "@/hooks/useAutoLogout";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
+// import AIDoubtDetail from "@/pages/admin/AI/AIDoubtDetail";
+// import AIReview from "@/pages/admin/AI/AIReview";
+import AttendancePage from "@/pages/admin/Attendance";
 import Login from "@/pages/shared/Login";
 import NotFound from "@/pages/shared/NotFound";
 import SubadminDashboard from "@/pages/subadmin/SubadminDashboard";
@@ -34,6 +37,30 @@ const AppRoutes = () => {
 						</ProtectedRoute>
 					}
 				/>
+				<Route
+					path={ROUTES.ATTENDANCE}
+					element={
+						<ProtectedRoute allowedRoles={["admin"]}>
+							<AttendancePage />
+						</ProtectedRoute>
+					}
+				/>
+				{/* <Route
+                    path={ROUTES.ADMIN_AI_DOUBT_DETAIL}
+                    element={
+                        <ProtectedRoute allowedRoles={["admin"]}>
+                            <AIDoubtDetail />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path={ROUTES.ADMIN_AI_REVIEW}
+                    element={
+                        <ProtectedRoute allowedRoles={["admin"]}>
+                            <AIReview />
+                        </ProtectedRoute>
+                    }
+                /> */}
 
 				{/* 404 Route */}
 				<Route path="*" element={<NotFound />} />

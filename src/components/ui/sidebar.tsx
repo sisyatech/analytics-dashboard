@@ -3,7 +3,7 @@
 import { IconMenu2, IconX } from "@tabler/icons-react";
 import { AnimatePresence, motion } from "motion/react";
 import React, { createContext, useContext, useState } from "react";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import type { SidebarLinkItem } from "@/types/sidebar";
 

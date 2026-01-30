@@ -50,14 +50,12 @@ export function ThemeProvider({
 	const value = {
 		theme,
 		setTheme: (theme: Theme) => {
-			// @ts-expect-error - document.startViewTransition is not yet in all TS versions
 			if (!document.startViewTransition) {
 				localStorage.setItem(storageKey, theme);
 				setTheme(theme);
 				return;
 			}
 
-			// @ts-expect-error
 			document.startViewTransition(() => {
 				localStorage.setItem(storageKey, theme);
 				setTheme(theme);

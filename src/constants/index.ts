@@ -10,5 +10,5 @@ export const API_BASE_URL = "https://sisyaclass.xyz";
 
 export const API_ENDPOINTS = {
 	ADMIN_LOGIN: "/rkadmin/login",
-	SUBADMIN_LOGIN: "/subadmin/login", // Mock endpoint
+	SUBADMIN_LOGIN: "/rkadmin/subadmin_login",
 } as const;

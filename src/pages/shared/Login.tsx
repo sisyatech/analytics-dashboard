@@ -181,18 +181,18 @@ export default function Login() {
 								transition={{ duration: 0.2 }}
 							>
 								<label htmlFor="userId" className="block text-sm font-medium text-gray-700">
-									User ID
+									{role === "admin" ? "User ID" : "Email"}
 								</label>
 								<div className="relative group">
 									<Input
 										id="userId"
-										type="text"
-										placeholder="Enter ID"
+										type={role === "admin" ? "text" : "email"}
+										placeholder={role === "admin" ? "Enter ID" : "Enter Email"}
 										className={cn(
 											"pl-4 pr-10 sm:pr-12 h-11 sm:h-12 text-sm sm:text-base transition-all duration-300",
 											"border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20",
 											errors.userId &&
-												"border-destructive focus:border-destructive focus:ring-destructive/20",
+											"border-destructive focus:border-destructive focus:ring-destructive/20",
 											focusedField === "userId" && "shadow-lg shadow-primary/10",
 										)}
 										disabled={isLoading}
@@ -236,7 +236,7 @@ export default function Login() {
 											"pl-4 pr-12 h-11 sm:h-12 text-sm sm:text-base transition-all duration-300",
 											"border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20",
 											errors.password &&
-												"border-destructive focus:border-destructive focus:ring-destructive/20",
+											"border-destructive focus:border-destructive focus:ring-destructive/20",
 											focusedField === "password" && "shadow-lg shadow-primary/10",
 										)}
 										disabled={isLoading}

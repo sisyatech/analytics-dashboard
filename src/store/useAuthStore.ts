@@ -6,10 +6,11 @@ interface AuthState {
 	user: AuthUser["user"] | null;
 	token: string | null;
 	role: UserRole | null;
+	analyticsPermissions: Record<string, any> | null;
 	isAuthenticated: boolean;
 
 	// Actions
-	login: (token: string, role: UserRole, user: AuthUser["user"]) => void;
+	login: (token: string, role: UserRole, user: AuthUser["user"], analyticsPermissions?: Record<string, any>) => void;
 	logout: () => void;
 }
 
@@ -19,13 +20,15 @@ export const useAuthStore = create<AuthState>()(
 			user: null,
 			token: null,
 			role: null,
+			analyticsPermissions: null,
 			isAuthenticated: false,
 
-			login: (token, role, user) =>
+			login: (token, role, user, analyticsPermissions) =>
 				set({
 					token,
 					role,
 					user,
+					analyticsPermissions: analyticsPermissions || null,
 					isAuthenticated: true,
 				}),
 

@@ -8,6 +8,19 @@ export interface AuthUser {
 		name: string;
 		email?: string;
 	};
+	analyticsPermissions?: Record<string, any>;
+}
+
+export interface AnalyticsPermissions {
+	[key: string]: any;
+}
+
+export interface SubAdminData {
+	id: string;
+	name: string;
+	email: string;
+	role: UserRole;
+	analyticsPermissions: AnalyticsPermissions;
 }
 
 export interface LoginResponse {
@@ -24,6 +37,7 @@ export interface LoginResponse {
 		name: string;
 		email?: string;
 	};
+	subAdmin?: SubAdminData;
 }
 
 export interface LoginCredentials {

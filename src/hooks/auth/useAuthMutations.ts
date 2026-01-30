@@ -16,10 +16,10 @@ export const useAdminLogin = () => {
 				// API only returns token, so we construct the user from the input ID
 				const adminUser = data.admin ||
 					data.user || {
-						id: variables.userId,
-						name: variables.userId,
-						email: "",
-					};
+					id: variables.userId,
+					name: variables.userId,
+					email: "",
+				};
 				login(data.token, "admin", adminUser);
 				navigate(ROUTES.ADMIN_DASHBOARD);
 			}
@@ -34,8 +34,13 @@ export const useSubadminLogin = () => {
 	return useMutation({
 		mutationFn: ({ userId, password }: LoginCredentials) => loginSubadmin(userId, password),
 		onSuccess: (data) => {
-			if (data.token && data.user) {
-				login(data.token, "subadmin", data.user);
+			if (data.token && data.subAdmin) {
+				const user = {
+					id: data.subAdmin.id,
+					name: data.subAdmin.name,
+					email: data.subAdmin.email,
+				};
+				login(data.token, "subadmin", user, data.subAdmin.analyticsPermissions);
 				navigate(ROUTES.SUBADMIN_DASHBOARD);
 			}
 		},

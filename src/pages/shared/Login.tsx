@@ -68,7 +68,7 @@ export default function Login() {
 	return (
 		<div className="h-screen flex flex-col lg:flex-row overflow-hidden bg-gray-50">
 			{/* Left Side - Branding with DomeGallery */}
-			<div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#1e3a5f] via-[#2563eb] to-[#2c5282] relative overflow-hidden">
+			<div className="hidden lg:flex lg:w-1/2 bg-linear-to-br from-[#1e3a5f] via-[#2563eb] to-[#2c5282] relative overflow-hidden">
 				<div className="absolute inset-0 z-10 h-full w-full">
 					<DomeGallery
 						fit={1}
@@ -83,7 +83,7 @@ export default function Login() {
 			</div>
 
 			{/* Mobile Header - Branding */}
-			<div className="lg:hidden bg-gradient-to-br from-[#1e3a5f] to-[#2c5282] px-6 py-4 text-white shadow-lg">
+			<div className="lg:hidden bg-linear-to-br from-[#1e3a5f] to-[#2c5282] px-6 py-4 text-white shadow-lg">
 				<div className="flex items-center gap-2">
 					<div className="bg-white/20 p-2 rounded-lg backdrop-blur-sm">
 						<GraduationCap className="w-5 h-5" />
@@ -93,7 +93,7 @@ export default function Login() {
 			</div>
 
 			{/* Right Side - Login Form */}
-			<div className="flex-1 flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-gray-50 p-4 sm:p-10">
+			<div className="flex-1 flex items-center justify-center bg-linear-to-br from-gray-50 via-white to-gray-50 p-4 sm:p-10">
 				<motion.div
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
@@ -102,7 +102,7 @@ export default function Login() {
 				>
 					<div className="space-y-6">
 						<div>
-							<h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+							<h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 bg-linear-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
 								Welcome back!
 							</h2>
 							<p className="text-gray-600 text-sm sm:text-base">
@@ -192,7 +192,7 @@ export default function Login() {
 											"pl-4 pr-10 sm:pr-12 h-11 sm:h-12 text-sm sm:text-base transition-all duration-300",
 											"border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20",
 											errors.userId &&
-											"border-destructive focus:border-destructive focus:ring-destructive/20",
+												"border-destructive focus:border-destructive focus:ring-destructive/20",
 											focusedField === "userId" && "shadow-lg shadow-primary/10",
 										)}
 										disabled={isLoading}
@@ -236,7 +236,7 @@ export default function Login() {
 											"pl-4 pr-12 h-11 sm:h-12 text-sm sm:text-base transition-all duration-300",
 											"border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20",
 											errors.password &&
-											"border-destructive focus:border-destructive focus:ring-destructive/20",
+												"border-destructive focus:border-destructive focus:ring-destructive/20",
 											focusedField === "password" && "shadow-lg shadow-primary/10",
 										)}
 										disabled={isLoading}

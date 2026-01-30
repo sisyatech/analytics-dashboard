@@ -6,11 +6,16 @@ interface AuthState {
 	user: AuthUser["user"] | null;
 	token: string | null;
 	role: UserRole | null;
-	analyticsPermissions: Record<string, any> | null;
+	analyticsPermissions: Record<string, boolean> | null;
 	isAuthenticated: boolean;
 
 	// Actions
-	login: (token: string, role: UserRole, user: AuthUser["user"], analyticsPermissions?: Record<string, any>) => void;
+	login: (
+		token: string,
+		role: UserRole,
+		user: AuthUser["user"],
+		analyticsPermissions?: Record<string, boolean>,
+	) => void;
 	logout: () => void;
 }
 

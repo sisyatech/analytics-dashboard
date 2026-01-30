@@ -1,6 +1,6 @@
+import { axiosInstance } from "@/api/axiosInstance";
 import { API_ENDPOINTS } from "@/constants";
 import type { LoginResponse } from "@/types/auth";
-import { axiosInstance } from "@/api/axiosInstance";
 
 export const loginAdmin = async (userId: string, password: string): Promise<LoginResponse> => {
 	const response = await axiosInstance.post<LoginResponse>(API_ENDPOINTS.ADMIN_LOGIN, {

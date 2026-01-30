@@ -16,10 +16,10 @@ export const useAdminLogin = () => {
 				// API only returns token, so we construct the user from the input ID
 				const adminUser = data.admin ||
 					data.user || {
-					id: variables.userId,
-					name: variables.userId,
-					email: "",
-				};
+						id: variables.userId,
+						name: variables.userId,
+						email: "",
+					};
 				login(data.token, "admin", adminUser);
 				navigate(ROUTES.ADMIN_DASHBOARD);
 			}

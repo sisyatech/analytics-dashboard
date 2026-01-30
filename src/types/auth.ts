@@ -8,11 +8,11 @@ export interface AuthUser {
 		name: string;
 		email?: string;
 	};
-	analyticsPermissions?: Record<string, any>;
+	analyticsPermissions?: Record<string, boolean>;
 }
 
 export interface AnalyticsPermissions {
-	[key: string]: any;
+	[key: string]: boolean;
 }
 
 export interface SubAdminData {

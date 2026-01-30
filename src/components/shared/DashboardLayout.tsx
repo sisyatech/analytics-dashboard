@@ -1,6 +1,7 @@
 import { IconChevronDown } from "@tabler/icons-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
+import { Outlet } from "react-router-dom";
 import { APP_NAME, ROUTES } from "@/constants";
 import { sidebarConfig } from "@/constants/sidebar";
 import { cn } from "@/lib/utils";
@@ -10,8 +11,8 @@ import { Sidebar, SidebarBody, SidebarLink, useSidebar } from "../ui/sidebar";
 import { ThemeToggle } from "./ThemeToggle";
 
 interface DashboardLayoutProps {
-	children: React.ReactNode;
-	actor: "admin" | "subadmin";
+	children?: React.ReactNode;
+	actor?: "admin" | "subadmin";
 	userName?: string;
 	userAvatar?: string;
 }
@@ -91,12 +92,15 @@ const NavItem = ({ link }: { link: SidebarItemMapped }) => {
 
 export function DashboardLayout({
 	children,
-	actor,
-	userName = "User",
+	actor: propActor,
+	userName: propUserName,
 	userAvatar,
 }: DashboardLayoutProps) {
-	const { analyticsPermissions, logout } = useAuthStore();
+	const { user, role, analyticsPermissions, logout } = useAuthStore();
 	const [open, setOpen] = useState(false);
+
+	const actor = propActor || role || "subadmin";
+	const userName = propUserName || user?.name || "User";
 
 	// Filtering logic
 	const filteredLinks: SidebarItemMapped[] = sidebarConfig
@@ -182,7 +186,7 @@ export function DashboardLayout({
 					</div>
 				</SidebarBody>
 			</Sidebar>
-			<Dashboard>{children}</Dashboard>
+			<Dashboard>{children || <Outlet />}</Dashboard>
 		</div>
 	);
 }

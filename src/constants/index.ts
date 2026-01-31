@@ -23,3 +23,5 @@ export const API_ENDPOINTS = {
 	CREATE_ANNOUNCEMENT: "/rkadmin/create_announcement",
 	MARK_AS_SISYA_EMP: "/rkadmin/mark_as_sisya_emp",
 } as const;
+
+export const GRADES = Array.from({ length: 12 }, (_, i) => (i + 1).toString());

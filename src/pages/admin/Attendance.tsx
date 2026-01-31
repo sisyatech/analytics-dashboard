@@ -7,6 +7,7 @@ import { AttendanceStats } from "@/components/admin/Attendance/AttendanceStats";
 import { AttendanceTable } from "@/components/admin/Attendance/AttendanceTable";
 import { LiveAnalytics } from "@/components/admin/Attendance/LiveAnalytics";
 import { SessionDetailHeader } from "@/components/admin/Attendance/SessionDetailHeader";
+import { SessionFilters } from "@/components/admin/Attendance/SessionFilters";
 import { SessionList } from "@/components/admin/Attendance/SessionList";
 import { ConfirmationModal } from "@/components/shared/ConfirmationModal";
 import {
@@ -35,6 +36,9 @@ export default function AttendancePage() {
 	const [statusFilter, setStatusFilter] = useState<"all" | "present" | "absent">("all");
 	const [expandedStudentId, setExpandedStudentId] = useState<number | null>(null);
 	const [currentPage, setCurrentPage] = useState(1);
+	const [sessionSearch, setSessionSearch] = useState("");
+	const [sessionStartDate, setSessionStartDate] = useState("");
+	const [sessionEndDate, setSessionEndDate] = useState("");
 
 	// Context Menu & Confirmation State
 	const [contextMenu, setContextMenu] = useState<{
@@ -63,6 +67,9 @@ export default function AttendancePage() {
 	const { data: sessionsData, isLoading: isLoadingSessions } = useSessionsByCourse(
 		selectedCourseId,
 		currentPage,
+		sessionStartDate,
+		sessionEndDate,
+		sessionSearch,
 	);
 	const { data: attendanceData } = useSessionAttendance(selectedSessionId);
 
@@ -172,13 +179,38 @@ export default function AttendancePage() {
 								/>
 
 								{selectedCourseId ? (
-									<SessionList
-										sessionsData={sessionsData}
-										isLoadingSessions={isLoadingSessions}
-										onSessionSelect={setSelectedSessionId}
-										currentPage={currentPage}
-										onPageChange={setCurrentPage}
-									/>
+									<div className="space-y-6">
+										<SessionFilters
+											search={sessionSearch}
+											onSearchChange={(val) => {
+												setSessionSearch(val);
+												setCurrentPage(1);
+											}}
+											startDate={sessionStartDate}
+											onStartDateChange={(val) => {
+												setSessionStartDate(val);
+												setCurrentPage(1);
+											}}
+											endDate={sessionEndDate}
+											onEndDateChange={(val) => {
+												setSessionEndDate(val);
+												setCurrentPage(1);
+											}}
+											onClear={() => {
+												setSessionSearch("");
+												setSessionStartDate("");
+												setSessionEndDate("");
+												setCurrentPage(1);
+											}}
+										/>
+										<SessionList
+											sessionsData={sessionsData}
+											isLoadingSessions={isLoadingSessions}
+											onSessionSelect={setSelectedSessionId}
+											currentPage={currentPage}
+											onPageChange={setCurrentPage}
+										/>
+									</div>
 								) : (
 									!selectedGrade && (
 										<div className="h-64 flex flex-col items-center justify-center text-neutral-400 border-2 border-dashed border-neutral-200 dark:border-neutral-700 rounded-2xl bg-neutral-50/50 dark:bg-neutral-800/20 transition-colors">

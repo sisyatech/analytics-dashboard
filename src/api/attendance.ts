@@ -18,10 +18,20 @@ export const getCompletedSessions = async (
 	courseId: number,
 	page = 1,
 	limit = 20,
+	startDate?: string,
+	endDate?: string,
+	search?: string,
 ): Promise<PaginatedSessionsResponse> => {
 	const response = await axiosInstance.post<PaginatedSessionsResponse>(
 		API_ENDPOINTS.GET_COMPLETED_SESSIONS,
-		{ id: courseId, page, limit },
+		{
+			id: courseId,
+			page,
+			limit,
+			startDate,
+			endDate,
+			search,
+		},
 	);
 	return response.data;
 };

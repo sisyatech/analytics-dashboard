@@ -18,12 +18,25 @@ export const useCoursesByGrade = (grade: string | null) => {
 	});
 };
 
-export const useSessionsByCourse = (courseId: number | null, page = 1) => {
+export const useSessionsByCourse = (
+	courseId: number | null,
+	page = 1,
+	startDate?: string,
+	endDate?: string,
+	search?: string,
+) => {
 	return useQuery({
-		queryKey: ["sessions", courseId, page],
+		queryKey: ["sessions", courseId, page, startDate, endDate, search],
 		queryFn: ({ queryKey }) => {
-			const [, id, currentPage] = queryKey as ["sessions", number, number];
-			return getCompletedSessions(id, currentPage);
+			const [, id, currentPage, start, end, q] = queryKey as [
+				string,
+				number,
+				number,
+				string | undefined,
+				string | undefined,
+				string | undefined,
+			];
+			return getCompletedSessions(id, currentPage, 20, start, end, q);
 		},
 		enabled: courseId !== null,
 		staleTime: 1000 * 60 * 5, // 5 minutes

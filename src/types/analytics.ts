@@ -10,6 +10,11 @@ export interface Teacher {
 	name: string;
 }
 
+export interface Subject {
+	id: number;
+	name: string;
+}
+
 export interface Session {
 	id: number;
 	detail: string;
@@ -17,6 +22,12 @@ export interface Session {
 	scheduledEndTime: string;
 	scheduledDuration: number;
 	scheduledTeacher: Teacher;
+	subject: Subject;
+	isHomeworkUploaded: boolean;
+	actualStartTime?: string;
+	actualEndTime?: string;
+	actualDuration?: number;
+	actualTeacher?: Teacher;
 }
 
 export interface AttendanceInterval {

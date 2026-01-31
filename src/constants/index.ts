@@ -20,4 +20,5 @@ export const API_ENDPOINTS = {
 	GET_COURSES_BY_GRADE: "/rkadmin/get_course_by_grade",
 	GET_COMPLETED_SESSIONS: "/rkadmin/get_completed_session",
 	GET_SESSION_ATTENDANCE: "/rkadmin/get_session_attendance",
+	CREATE_ANNOUNCEMENT: "/rkadmin/create_announcement",
 } as const;

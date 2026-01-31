@@ -2,6 +2,7 @@ import { axiosInstance } from "@/api/axiosInstance";
 import { API_ENDPOINTS } from "@/constants";
 import type {
 	CoursesResponse,
+	MarkAsSisyaEmpResponse,
 	PaginatedSessionsResponse,
 	SessionAttendanceResponse,
 } from "@/types/analytics";
@@ -31,6 +32,13 @@ export const getSessionAttendance = async (
 	const response = await axiosInstance.post<SessionAttendanceResponse>(
 		API_ENDPOINTS.GET_SESSION_ATTENDANCE,
 		{ sessionId },
+	);
+	return response.data;
+};
+export const markAsSisyaEmp = async (userId: number): Promise<MarkAsSisyaEmpResponse> => {
+	const response = await axiosInstance.post<MarkAsSisyaEmpResponse>(
+		API_ENDPOINTS.MARK_AS_SISYA_EMP,
+		{ userId },
 	);
 	return response.data;
 };

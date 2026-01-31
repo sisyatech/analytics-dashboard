@@ -1,5 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
-import { getCompletedSessions, getCoursesByGrade, getSessionAttendance } from "@/api/attendance";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+	getCompletedSessions,
+	getCoursesByGrade,
+	getSessionAttendance,
+	markAsSisyaEmp,
+} from "@/api/attendance";
 
 export const useCoursesByGrade = (grade: string | null) => {
 	return useQuery({
@@ -34,5 +39,15 @@ export const useSessionAttendance = (sessionId: number | null) => {
 		},
 		enabled: sessionId !== null,
 		staleTime: 1000 * 60 * 2, // 2 minutes
+	});
+};
+
+export const useMarkAsSisyaEmp = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: (userId: number) => markAsSisyaEmp(userId),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["attendance"] });
+		},
 	});
 };

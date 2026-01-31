@@ -25,6 +25,7 @@ import {
 import { AnimatePresence, motion } from "motion/react";
 import { Fragment, useMemo, useState } from "react";
 import { AnnouncementModal } from "@/components/admin/Attendance/AnnouncementModal";
+import { ConfirmationModal } from "@/components/shared/ConfirmationModal";
 import { Button } from "@/components/ui/button";
 import {
 	Select,
@@ -35,6 +36,7 @@ import {
 } from "@/components/ui/select";
 import {
 	useCoursesByGrade,
+	useMarkAsSisyaEmp,
 	useSessionAttendance,
 	useSessionsByCourse,
 } from "@/hooks/analytics/useAttendance";
@@ -178,6 +180,21 @@ export default function AttendancePage() {
 	const [statusFilter, setStatusFilter] = useState<"all" | "present" | "absent">("all");
 	const [expandedStudentId, setExpandedStudentId] = useState<number | null>(null);
 	const [currentPage, setCurrentPage] = useState(1);
+
+	// Context Menu & Confirmation State
+	const [contextMenu, setContextMenu] = useState<{
+		x: number;
+		y: number;
+		studentId: number;
+		studentName: string;
+	} | null>(null);
+	const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+	const [selectedStudentForEmp, setSelectedStudentForEmp] = useState<{
+		id: number;
+		name: string;
+	} | null>(null);
+
+	const { mutate: markAsEmp, isPending: isMarkingEmp } = useMarkAsSisyaEmp();
 
 	// Announcement Modal State
 	const [isAnnouncementModalOpen, setIsAnnouncementModalOpen] = useState(false);
@@ -838,8 +855,20 @@ export default function AttendancePage() {
 																				<div className="w-10 h-10 rounded-2xl bg-linear-to-br from-neutral-100 to-neutral-200 dark:from-neutral-700 dark:to-neutral-600 flex items-center justify-center font-black text-neutral-600 dark:text-neutral-200 shadow-sm group-hover:scale-110 transition-transform">
 																					{student.name.charAt(0)}
 																				</div>
-																				<div>
-																					<p className="font-bold text-neutral-900 dark:text-white mb-0.5">
+																				{/* biome-ignore lint/a11y/noStaticElementInteractions: div used as clickable element */}
+																				<div
+																					onContextMenu={(e) => {
+																						e.preventDefault();
+																						setContextMenu({
+																							x: e.pageX,
+																							y: e.pageY,
+																							studentId: student.studentId,
+																							studentName: student.name,
+																						});
+																					}}
+																					className="relative"
+																				>
+																					<p className="font-bold text-neutral-900 dark:text-white mb-0.5 hover:text-blue-600 transition-colors cursor-context-menu">
 																						{student.name}
 																					</p>
 																					<p className="text-[10px] font-black text-neutral-400 tracking-widest">
@@ -1065,6 +1094,78 @@ export default function AttendancePage() {
 				initialPayload={announcementPayload}
 				userName={announcementTargetName}
 			/>
+
+			{/* Context Menu */}
+			<AnimatePresence>
+				{contextMenu && (
+					<motion.div
+						initial={{ opacity: 0, scale: 0.95 }}
+						animate={{ opacity: 1, scale: 1 }}
+						exit={{ opacity: 0, scale: 0.95 }}
+						style={{ top: contextMenu.y, left: contextMenu.x }}
+						className="fixed z-100 min-w-50 overflow-hidden rounded-2xl border border-neutral-200 bg-white/80 p-1.5 shadow-2xl backdrop-blur-xl dark:border-neutral-700 dark:bg-neutral-800/80"
+					>
+						<button
+							type="button"
+							onClick={() => {
+								setSelectedStudentForEmp({
+									id: contextMenu.studentId,
+									name: contextMenu.studentName,
+								});
+								setIsConfirmModalOpen(true);
+								setContextMenu(null);
+							}}
+							className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-xs font-bold text-neutral-700 transition hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-700/50"
+						>
+							<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+								<IconUserCheck className="h-4 w-4" />
+							</div>
+							Mark as Sisya Employee
+						</button>
+					</motion.div>
+				)}
+			</AnimatePresence>
+
+			<ConfirmationModal
+				isOpen={isConfirmModalOpen}
+				onClose={() => setIsConfirmModalOpen(false)}
+				onConfirm={() => {
+					if (selectedStudentForEmp) {
+						markAsEmp(selectedStudentForEmp.id, {
+							onSuccess: () => {
+								setIsConfirmModalOpen(false);
+								setSelectedStudentForEmp(null);
+							},
+						});
+					}
+				}}
+				isLoading={isMarkingEmp}
+				title="Mark as Sisya Employee"
+				message={`Are you sure you want to mark ${selectedStudentForEmp?.name} as a Sisya employee? Once marked, they will not appear in any grade roll call.`}
+				confirmText="Mark as Employee"
+				variant="info"
+			/>
+
+			{/* Close context menu on click outside */}
+			{contextMenu && (
+				<button
+					type="button"
+					aria-label="Close context menu"
+					className="fixed inset-0 z-50"
+					onClick={() => setContextMenu(null)}
+					onContextMenu={(e) => {
+						e.preventDefault();
+						setContextMenu(null);
+					}}
+					onKeyDown={(e: React.KeyboardEvent) => {
+						// Close on Enter, Space or Escape for accessibility
+						if (e.key === "Enter" || e.key === " " || e.key === "Spacebar" || e.key === "Escape") {
+							e.preventDefault();
+							setContextMenu(null);
+						}
+					}}
+				/>
+			)}
 		</div>
 	);
 }

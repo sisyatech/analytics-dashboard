@@ -72,3 +72,7 @@ export interface CoursesResponse {
 	success: boolean;
 	courses: Course[];
 }
+export interface MarkAsSisyaEmpResponse {
+	success: boolean;
+	message: string;
+}

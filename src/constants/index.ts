@@ -21,4 +21,5 @@ export const API_ENDPOINTS = {
 	GET_COMPLETED_SESSIONS: "/rkadmin/get_completed_session",
 	GET_SESSION_ATTENDANCE: "/rkadmin/get_session_attendance",
 	CREATE_ANNOUNCEMENT: "/rkadmin/create_announcement",
+	MARK_AS_SISYA_EMP: "/rkadmin/mark_as_sisya_emp",
 } as const;

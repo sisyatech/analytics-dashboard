@@ -9,6 +9,7 @@ import type {
 	StudentsResponse,
 	TestDetailsResponse,
 } from "@/types/performance";
+import type { ReviewDetailsResponse } from "@/types/reviews";
 
 export const getStudentsByCourse = async (bigCourseId: number): Promise<StudentsResponse> => {
 	const { data } = await axiosInstance.post<StudentsResponse>(
@@ -118,6 +119,17 @@ export const getPerformanceCoins = async (
 	const { data } = await axiosInstance.post<CoinsTransactionsResponse>(
 		API_ENDPOINTS.GET_PERFORMANCE_COINS,
 		{ endUsersId },
+	);
+	return data;
+};
+
+export const getPerformanceReviews = async (
+	endUsersId: number,
+	bigCourseId: number,
+): Promise<ReviewDetailsResponse> => {
+	const { data } = await axiosInstance.post<ReviewDetailsResponse>(
+		API_ENDPOINTS.GET_PERFORMANCE_REVIEWS,
+		{ endUsersId, bigCourseId },
 	);
 	return data;
 };

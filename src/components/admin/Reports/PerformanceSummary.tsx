@@ -4,6 +4,7 @@ import {
 	IconCoins,
 	IconDeviceLaptop,
 	IconPencil,
+	IconStar,
 	IconTrophy,
 } from "@tabler/icons-react";
 import { motion } from "motion/react";
@@ -64,6 +65,22 @@ export const PerformanceSummary = ({ summary }: PerformanceSummaryProps) => {
 			color: "text-yellow-500",
 			bg: "bg-yellow-50 dark:bg-yellow-900/20",
 			footer: `Total Earned: ${summary.coins.totalEarned}`,
+		},
+		{
+			title: "Reviews",
+			value: (
+				(summary.reviews.totalSessionFeedbacks +
+					summary.reviews.totalDoubtReviews +
+					summary.reviews.totalMentorReviews +
+					summary.reviews.totalAIRatings) /
+				4
+			).toFixed(1),
+			label: "Avg Rating",
+			subValue: `${summary.reviews.totalSessionFeedbacks} Session | ${summary.reviews.totalDoubtReviews} Doubt`,
+			icon: IconStar,
+			color: "text-orange-500",
+			bg: "bg-orange-50 dark:bg-orange-900/20",
+			footer: `${summary.reviews.totalMentorReviews} Mentor | ${summary.reviews.totalAIRatings} AI Ratings`,
 		},
 	];
 

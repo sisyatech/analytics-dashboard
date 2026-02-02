@@ -4,6 +4,7 @@ import {
 	getPerformanceCoins,
 	getPerformanceHomework,
 	getPerformanceQuizzes,
+	getPerformanceReviews,
 	getPerformanceSummary,
 	getPerformanceTests,
 	getStudentsByCourse,
@@ -97,5 +98,18 @@ export const usePerformanceCoins = (studentId: number | null) => {
 			return getPerformanceCoins(studentId);
 		},
 		enabled: Boolean(studentId),
+	});
+};
+
+export const usePerformanceReviews = (studentId: number | null, courseId: number | null) => {
+	return useQuery({
+		queryKey: ["performance-reviews", studentId, courseId],
+		queryFn: () => {
+			if (!studentId || !courseId) {
+				throw new Error("studentId and courseId are required");
+			}
+			return getPerformanceReviews(studentId, courseId);
+		},
+		enabled: Boolean(studentId && courseId),
 	});
 };

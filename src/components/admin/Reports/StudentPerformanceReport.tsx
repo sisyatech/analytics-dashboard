@@ -6,12 +6,14 @@ import { AttendanceView } from "@/components/admin/Reports/AttendanceView";
 import { CoinsView } from "@/components/admin/Reports/CoinsView";
 import { HomeworkView } from "@/components/admin/Reports/HomeworkView";
 import { PerformanceSummary } from "@/components/admin/Reports/PerformanceSummary";
+import { ReviewsView } from "@/components/admin/Reports/ReviewsView";
 import { Button } from "@/components/ui/button";
 import {
 	usePerformanceAttendance,
 	usePerformanceCoins,
 	usePerformanceHomework,
 	usePerformanceQuizzes,
+	usePerformanceReviews,
 	usePerformanceSummary,
 	usePerformanceTests,
 } from "@/hooks/analytics/usePerformance";
@@ -29,7 +31,7 @@ export const StudentPerformanceReport = ({
 	onBack,
 }: StudentPerformanceReportProps) => {
 	const [activeTab, setActiveTab] = useState<
-		"summary" | "attendance" | "assessments" | "homework" | "coins"
+		"summary" | "attendance" | "assessments" | "homework" | "coins" | "reviews"
 	>("summary");
 
 	// Performance Data
@@ -51,6 +53,10 @@ export const StudentPerformanceReport = ({
 		courseId,
 	);
 	const { data: coinsData, isLoading: isLoadingCoins } = usePerformanceCoins(student.id);
+	const { data: reviewsData, isLoading: isLoadingReviews } = usePerformanceReviews(
+		student.id,
+		courseId,
+	);
 
 	const isLoading =
 		isLoadingSummary ||
@@ -58,7 +64,8 @@ export const StudentPerformanceReport = ({
 		isLoadingQuizzes ||
 		isLoadingTests ||
 		isLoadingHomework ||
-		isLoadingCoins;
+		isLoadingCoins ||
+		isLoadingReviews;
 
 	return (
 		<div className="space-y-6">
@@ -78,20 +85,22 @@ export const StudentPerformanceReport = ({
 
 			{/* Tabs */}
 			<div className="flex items-center gap-2 p-1 rounded-xl bg-neutral-100 dark:bg-neutral-800 w-fit">
-				{(["summary", "attendance", "assessments", "homework", "coins"] as const).map((tab) => (
-					<button
-						key={tab}
-						type="button"
-						onClick={() => setActiveTab(tab)}
-						className={`px-4 py-2 text-sm font-bold rounded-lg transition-all ${
-							activeTab === tab
-								? "bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-sm"
-								: "text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
-						}`}
-					>
-						{tab.charAt(0).toUpperCase() + tab.slice(1)}
-					</button>
-				))}
+				{(["summary", "attendance", "assessments", "homework", "coins", "reviews"] as const).map(
+					(tab) => (
+						<button
+							key={tab}
+							type="button"
+							onClick={() => setActiveTab(tab)}
+							className={`px-4 py-2 text-sm font-bold rounded-lg transition-all ${
+								activeTab === tab
+									? "bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-sm"
+									: "text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
+							}`}
+						>
+							{tab.charAt(0).toUpperCase() + tab.slice(1)}
+						</button>
+					),
+				)}
 			</div>
 
 			{/* Content */}
@@ -121,6 +130,9 @@ export const StudentPerformanceReport = ({
 							<HomeworkView data={homeworkData.homeworkDetails} />
 						)}
 						{activeTab === "coins" && coinsData && <CoinsView data={coinsData.data} />}
+						{activeTab === "reviews" && reviewsData && (
+							<ReviewsView data={reviewsData.reviewDetails} />
+						)}
 					</motion.div>
 				)}
 			</div>

@@ -1,4 +1,5 @@
-import { IconArrowLeft, IconLoader, IconUser } from "@tabler/icons-react";
+import { IconArrowLeft, IconCalendar, IconLoader, IconUser } from "@tabler/icons-react";
+import { format, parseISO } from "date-fns";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { AssessmentsView } from "@/components/admin/Reports/AssessmentsView";
@@ -79,7 +80,14 @@ export const StudentPerformanceReport = ({
 						<IconUser className="w-6 h-6 text-blue-500" />
 						{student.name}
 					</h2>
-					<p className="text-sm text-neutral-500">Results for Grade {student.grade}</p>
+					<div className="flex items-center gap-3 mt-1">
+						<p className="text-sm font-medium text-neutral-500">Grade {student.grade}</p>
+						<span className="w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-700" />
+						<p className="text-sm text-neutral-400 flex items-center gap-1.5">
+							<IconCalendar className="w-3.5 h-3.5" />
+							Part of SISYA family since {format(parseISO(student.joinedAt), "MMMM dd, yyyy")}
+						</p>
+					</div>
 				</div>
 			</div>
 

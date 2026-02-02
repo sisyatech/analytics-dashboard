@@ -5,6 +5,7 @@ export interface Student {
 	email: string;
 	phone: string;
 	grade: string;
+	joinedAt: string;
 }
 
 export interface StudentsResponse {

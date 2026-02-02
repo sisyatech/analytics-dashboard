@@ -98,6 +98,7 @@ export interface QuizSubmission {
 export interface SessionQuizDetail {
 	sessionId: number;
 	sessionTitle: string;
+	sessionDate: string;
 	quizzes: QuizSubmission[];
 }
 
@@ -110,9 +111,11 @@ export interface TestDetail {
 	testId: number;
 	title: string;
 	mode: string;
+	testDate: string;
 	maxMarks: number;
 	isAttempted: boolean;
 	marks: number;
+	rank: number | null;
 	status: string;
 	submittedAt: string | null;
 }

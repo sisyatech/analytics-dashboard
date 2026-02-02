@@ -1,0 +1,142 @@
+export interface Student {
+	id: number;
+	uuid: string;
+	name: string;
+	email: string;
+	phone: string;
+	grade: string;
+}
+
+export interface StudentsResponse {
+	success: boolean;
+	students: Student[];
+}
+
+export interface PerformanceSummary {
+	attendance: {
+		lateJoinRate: number;
+		earlyLeaveRate: number;
+		finishRate: number;
+		attendanceRate: number;
+		presentCount: number;
+		totalSessions: number;
+		classAvgRate: number;
+	};
+	quizzes: {
+		total: number;
+		attempted: number;
+		correct: number;
+		participationRate: number;
+		accuracy: number;
+		classAvgParticipation: number;
+	};
+	tests: {
+		total: number;
+		attempted: number;
+		completionRate: number;
+		classAvgCompletion: number;
+	};
+	homework: {
+		total: number;
+		attempted: number;
+		totalQuestions: number;
+		totalCorrect: number;
+		attemptRate: number;
+		classAvgAttemptRate: number;
+	};
+	doubts: {
+		total: number;
+		solved: number;
+	};
+	satisfaction: {
+		averageRating: number;
+		feedbackCount: number;
+	};
+}
+
+export interface PerformanceSummaryResponse {
+	success: boolean;
+	summary: PerformanceSummary;
+}
+
+export interface AttendanceDetail {
+	sessionId: number;
+	title: string;
+	startTime: string;
+	endTime: string;
+	isPresent: boolean;
+	joinTime: string | null;
+	leaveTime: string | null;
+	isLateJoin: boolean;
+	isEarlyLeave: boolean;
+	effectiveDuration: number;
+}
+
+export interface AttendanceDetailsResponse {
+	success: boolean;
+	attendanceDetails: AttendanceDetail[];
+}
+
+export interface QuizSubmission {
+	quizId: number;
+	isCorrect: boolean;
+	timeTaken: number;
+	submittedAt: string;
+}
+
+export interface SessionQuizDetail {
+	sessionId: number;
+	sessionTitle: string;
+	quizzes: QuizSubmission[];
+}
+
+export interface QuizDetailsResponse {
+	success: boolean;
+	sessionQuizzes: SessionQuizDetail[];
+}
+
+export interface TestDetail {
+	testId: number;
+	title: string;
+	mode: string;
+	maxMarks: number;
+	isAttempted: boolean;
+	marks: number;
+	status: string;
+	submittedAt: string | null;
+}
+
+export interface TestDetailsResponse {
+	success: boolean;
+	testDetails: TestDetail[];
+}
+
+export interface HomeworkApiItem {
+	homeworkId: number;
+	sessionId: number;
+	sessionName: string;
+	sessionDate: string;
+	maxMarks: number;
+	marks: number;
+	isAttempted: boolean;
+	submittedAt: string | null;
+}
+
+export interface HomeworkDetail {
+	homeworkId: number;
+	title: string;
+	description: string;
+	assignedDate: string;
+	dueDate: string | null;
+	isSubmitted: boolean;
+	submittedAt: string | null;
+	totalQuestions: number;
+	correctAnswers: number;
+	score: number; // Percentage or absolute value
+	status: "PENDING" | "SUBMITTED" | "LATE" | "MISSED";
+}
+
+export interface HomeworkDetailsResponse {
+	success: boolean;
+	homeworkDetails: HomeworkApiItem[];
+}

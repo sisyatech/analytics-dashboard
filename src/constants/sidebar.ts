@@ -17,10 +17,17 @@ export const sidebarConfig: SidebarNavItem[] = [
 	},
 	{
 		label: "Attendance",
-		icon: Icons.IconClipboardData,
+		icon: Icons.IconListDetails,
 		roles: ["admin"],
 		permissionKey: "attendance_access",
 		path: ROUTES.ATTENDANCE,
+	},
+	{
+		label: "Student Report",
+		icon: Icons.IconReportAnalytics,
+		roles: ["admin"],
+		permissionKey: "student_report_access",
+		path: ROUTES.STUDENT_REPORT,
 	},
 	{
 		label: "AI",

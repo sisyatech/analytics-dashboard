@@ -3,11 +3,13 @@ import { motion } from "motion/react";
 import { useState } from "react";
 import { AssessmentsView } from "@/components/admin/Reports/AssessmentsView";
 import { AttendanceView } from "@/components/admin/Reports/AttendanceView";
+import { CoinsView } from "@/components/admin/Reports/CoinsView";
 import { HomeworkView } from "@/components/admin/Reports/HomeworkView";
 import { PerformanceSummary } from "@/components/admin/Reports/PerformanceSummary";
 import { Button } from "@/components/ui/button";
 import {
 	usePerformanceAttendance,
+	usePerformanceCoins,
 	usePerformanceHomework,
 	usePerformanceQuizzes,
 	usePerformanceSummary,
@@ -26,9 +28,9 @@ export const StudentPerformanceReport = ({
 	courseId,
 	onBack,
 }: StudentPerformanceReportProps) => {
-	const [activeTab, setActiveTab] = useState<"summary" | "attendance" | "assessments" | "homework">(
-		"summary",
-	);
+	const [activeTab, setActiveTab] = useState<
+		"summary" | "attendance" | "assessments" | "homework" | "coins"
+	>("summary");
 
 	// Performance Data
 	const { data: summaryData, isLoading: isLoadingSummary } = usePerformanceSummary(
@@ -48,13 +50,15 @@ export const StudentPerformanceReport = ({
 		student.id,
 		courseId,
 	);
+	const { data: coinsData, isLoading: isLoadingCoins } = usePerformanceCoins(student.id);
 
 	const isLoading =
 		isLoadingSummary ||
 		isLoadingAttendance ||
 		isLoadingQuizzes ||
 		isLoadingTests ||
-		isLoadingHomework;
+		isLoadingHomework ||
+		isLoadingCoins;
 
 	return (
 		<div className="space-y-6">
@@ -74,7 +78,7 @@ export const StudentPerformanceReport = ({
 
 			{/* Tabs */}
 			<div className="flex items-center gap-2 p-1 rounded-xl bg-neutral-100 dark:bg-neutral-800 w-fit">
-				{(["summary", "attendance", "assessments", "homework"] as const).map((tab) => (
+				{(["summary", "attendance", "assessments", "homework", "coins"] as const).map((tab) => (
 					<button
 						key={tab}
 						type="button"
@@ -116,6 +120,7 @@ export const StudentPerformanceReport = ({
 						{activeTab === "homework" && homeworkData && (
 							<HomeworkView data={homeworkData.homeworkDetails} />
 						)}
+						{activeTab === "coins" && coinsData && <CoinsView data={coinsData.data} />}
 					</motion.div>
 				)}
 			</div>

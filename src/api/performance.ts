@@ -2,6 +2,7 @@ import { axiosInstance } from "@/api/axiosInstance";
 import { API_ENDPOINTS } from "@/constants";
 import type {
 	AttendanceDetailsResponse,
+	CoinsTransactionsResponse,
 	HomeworkDetailsResponse,
 	PerformanceSummaryResponse,
 	QuizDetailsResponse,
@@ -109,4 +110,14 @@ export const getPerformanceHomework = async (
 		success: data.success,
 		homeworkDetails: transformedDetails,
 	};
+};
+
+export const getPerformanceCoins = async (
+	endUsersId: number,
+): Promise<CoinsTransactionsResponse> => {
+	const { data } = await axiosInstance.post<CoinsTransactionsResponse>(
+		API_ENDPOINTS.GET_PERFORMANCE_COINS,
+		{ endUsersId },
+	);
+	return data;
 };

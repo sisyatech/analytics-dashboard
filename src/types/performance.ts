@@ -52,6 +52,11 @@ export interface PerformanceSummary {
 		averageRating: number;
 		feedbackCount: number;
 	};
+	coins: {
+		balance: number;
+		totalEarned: number;
+		totalSpent: number;
+	};
 }
 
 export interface PerformanceSummaryResponse {
@@ -139,4 +144,36 @@ export interface HomeworkDetail {
 export interface HomeworkDetailsResponse {
 	success: boolean;
 	homeworkDetails: HomeworkApiItem[];
+}
+
+export interface CoinTransaction {
+	id: string;
+	walletId: string;
+	type: string;
+	status: string;
+	amount: string;
+	fee: string;
+	balanceBefore: string;
+	balanceAfter: string;
+	balanceType: string;
+	counterpartyWalletId: string;
+	metadata: {
+		reason: string;
+		taskCode: string;
+		expiresAt: string | null;
+		expiryBalanceId: string | null;
+	};
+	reference: string | null;
+	createdAt: string;
+	initiatedByType: string;
+	initiatedById: number | null;
+	wallet: {
+		ownerType: string;
+		ownerId: number;
+	};
+}
+
+export interface CoinsTransactionsResponse {
+	success: boolean;
+	data: CoinTransaction[];
 }

@@ -1,6 +1,7 @@
 import {
 	IconCheck,
 	IconClipboardCheck,
+	IconCoins,
 	IconDeviceLaptop,
 	IconPencil,
 	IconTrophy,
@@ -54,10 +55,20 @@ export const PerformanceSummary = ({ summary }: PerformanceSummaryProps) => {
 			bg: "bg-purple-50 dark:bg-purple-900/20",
 			footer: `${summary.homework.totalCorrect} Correct Answers`,
 		},
+		{
+			title: "Coins",
+			value: summary.coins.balance.toLocaleString(),
+			label: "Current Balance",
+			subValue: `Earned: ${summary.coins.totalEarned} | Spent: ${summary.coins.totalSpent}`,
+			icon: IconCoins,
+			color: "text-yellow-500",
+			bg: "bg-yellow-50 dark:bg-yellow-900/20",
+			footer: `Total Earned: ${summary.coins.totalEarned}`,
+		},
 	];
 
 	return (
-		<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+		<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
 			{cards.map((card, index) => (
 				<motion.div
 					key={card.title}

@@ -29,6 +29,7 @@ export const API_ENDPOINTS = {
 	GET_PERFORMANCE_QUIZZES: "/rkadmin/performance/quizzes",
 	GET_PERFORMANCE_TESTS: "/rkadmin/performance/tests",
 	GET_PERFORMANCE_HOMEWORK: "/rkadmin/performance/homework",
+	GET_PERFORMANCE_COINS: "/rkadmin/performance/coins",
 } as const;
 
 export const GRADES = Array.from({ length: 12 }, (_, i) => (i + 1).toString());

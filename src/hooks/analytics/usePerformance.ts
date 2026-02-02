@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import {
 	getPerformanceAttendance,
+	getPerformanceCoins,
 	getPerformanceHomework,
 	getPerformanceQuizzes,
 	getPerformanceSummary,
@@ -83,5 +84,18 @@ export const usePerformanceHomework = (studentId: number | null, courseId: numbe
 			return getPerformanceHomework(studentId, courseId);
 		},
 		enabled: Boolean(studentId && courseId),
+	});
+};
+
+export const usePerformanceCoins = (studentId: number | null) => {
+	return useQuery({
+		queryKey: ["performance-coins", studentId],
+		queryFn: () => {
+			if (!studentId) {
+				throw new Error("studentId is required");
+			}
+			return getPerformanceCoins(studentId);
+		},
+		enabled: Boolean(studentId),
 	});
 };

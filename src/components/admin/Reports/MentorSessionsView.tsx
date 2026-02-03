@@ -29,8 +29,11 @@ export const MentorSessionsView = ({ data }: MentorSessionsViewProps) => {
 	const [isStudentListOpen, setIsStudentListOpen] = useState(false);
 	const [isReviewsOpen, setIsReviewsOpen] = useState(false);
 
-	const visibleData = useMemo(() => data.slice(0, visibleCount), [data, visibleCount]);
-	const hasMore = visibleCount < data.length;
+	const visibleData = useMemo(
+		() => (Array.isArray(data) ? data.slice(0, visibleCount) : []),
+		[data, visibleCount],
+	);
+	const hasMore = visibleCount < (data?.length || 0);
 
 	useEffect(() => {
 		const observer = new IntersectionObserver(
@@ -67,7 +70,7 @@ export const MentorSessionsView = ({ data }: MentorSessionsViewProps) => {
 		setIsReviewsOpen(true);
 	};
 
-	if (data.length === 0) {
+	if (!data || data.length === 0) {
 		return (
 			<div className="flex flex-col items-center justify-center py-20 text-neutral-400 bg-white dark:bg-neutral-800 rounded-3xl border border-dashed border-neutral-100 dark:border-neutral-700">
 				<IconCalendar className="w-12 h-12 mb-4 opacity-20" />

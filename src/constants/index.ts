@@ -39,6 +39,8 @@ export const API_ENDPOINTS = {
 	GET_SESSIONS_BY_MENTOR: "/rkadmin/get_sessions_by_mentor",
 	GET_PRESENT_STUDENTS: "/rkadmin/get_present_students",
 	GET_SESSION_REVIEWS: "/rkadmin/get_session_reviews",
+	GET_MENTOR_REWARD_TRANSACTIONS: "/rkadmin/get_mentor_reward_transactions",
+	ALLOCATE_REWARD_BUDGET: "/rkadmin/sisyacoin/reward-budgets/allocate",
 } as const;
 
 export const GRADES = Array.from({ length: 12 }, (_, i) => (i + 1).toString());

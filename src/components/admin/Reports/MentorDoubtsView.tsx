@@ -53,12 +53,17 @@ export const MentorDoubtsView = ({ data }: MentorDoubtsViewProps) => {
 	const [endDate, setEndDate] = useState<string>("");
 
 	const chartFilteredData = useMemo(() => {
+		if (!Array.isArray(data)) return [];
 		if (chartRange === "all") return data;
-		const cutoff = startOfDay(subDays(new Date(), parseInt(chartRange, 10)));
+		const rangeValue = parseInt(chartRange, 10);
+		// biome-ignore lint/suspicious/noGlobalIsNan: any used to avoid complex type issues
+		if (isNaN(rangeValue)) return data;
+		const cutoff = startOfDay(subDays(new Date(), rangeValue));
 		return data.filter((item) => isAfter(parseISO(item.createdAt), cutoff));
 	}, [data, chartRange]);
 
 	const listDateFilteredData = useMemo(() => {
+		if (!Array.isArray(data)) return [];
 		return data.filter((item) => {
 			const itemDate = format(parseISO(item.createdAt), "yyyy-MM-dd");
 			if (startDate && itemDate < startDate) return false;
@@ -81,7 +86,7 @@ export const MentorDoubtsView = ({ data }: MentorDoubtsViewProps) => {
 	}, [listDateFilteredData, searchQuery, statusFilter]);
 
 	const trendData = useMemo(() => {
-		const rangeInDays = parseInt(chartRange, 10);
+		const rangeInDays = parseInt(chartRange, 10) || 7; // Default to 7 if "all" or NaN
 		const days = Array.from({ length: rangeInDays }, (_, i) => {
 			const date = subDays(new Date(), rangeInDays - 1 - i);
 			return {
@@ -253,7 +258,7 @@ export const MentorDoubtsView = ({ data }: MentorDoubtsViewProps) => {
 				</Select>
 			</div>
 
-			{filteredListData.length === 0 ? (
+			{!filteredListData || filteredListData.length === 0 ? (
 				<div className="flex flex-col items-center justify-center py-20 text-neutral-400 bg-white dark:bg-neutral-800 rounded-3xl border border-dashed border-neutral-100 dark:border-neutral-700">
 					<IconHelpCircle className="w-12 h-12 mb-4 opacity-20" />
 					<p className="font-medium">No doubts found in this range.</p>

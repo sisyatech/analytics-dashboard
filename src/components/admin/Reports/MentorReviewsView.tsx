@@ -40,26 +40,29 @@ export const MentorReviewsView = ({ data }: MentorReviewsViewProps) => {
 
 	const summary = useMemo(() => {
 		const calculateAvg = (items: MentorReviewItem[]) =>
-			items.length > 0 ? items.reduce((acc, i) => acc + i.rating, 0) / items.length : 0;
+			items?.length > 0 ? items.reduce((acc, i) => acc + i.rating, 0) / items.length : 0;
+
+		const { sessionFeedbacks = [], doubtReviews = [], mentorRatings = [] } = data || {};
 
 		return {
-			avgMentorRating: calculateAvg(data.mentorRatings),
-			avgSessionRating: calculateAvg(data.sessionFeedbacks),
-			avgDoubtRating: calculateAvg(data.doubtReviews),
-			totalMentorReviews: data.mentorRatings.length,
-			totalSessionFeedbacks: data.sessionFeedbacks.length,
-			totalDoubtReviews: data.doubtReviews.length,
+			avgMentorRating: calculateAvg(mentorRatings),
+			avgSessionRating: calculateAvg(sessionFeedbacks),
+			avgDoubtRating: calculateAvg(doubtReviews),
+			totalMentorReviews: mentorRatings.length,
+			totalSessionFeedbacks: sessionFeedbacks.length,
+			totalDoubtReviews: doubtReviews.length,
 		};
 	}, [data]);
 
 	const currentData = useMemo(() => {
+		const { sessionFeedbacks = [], doubtReviews = [], mentorRatings = [] } = data || {};
 		switch (selectedType) {
 			case "mentor":
-				return data.mentorRatings;
+				return mentorRatings;
 			case "session":
-				return data.sessionFeedbacks;
+				return sessionFeedbacks;
 			case "doubt":
-				return data.doubtReviews;
+				return doubtReviews;
 			default:
 				return [];
 		}

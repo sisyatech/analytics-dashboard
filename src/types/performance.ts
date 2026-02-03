@@ -282,6 +282,17 @@ export interface MentorSummary {
 		overallAvgRating: number;
 		totalReviews: number;
 	};
+	rewardBudget: {
+		balance: string;
+		usage: {
+			today: string;
+			thisMonth: string;
+		};
+		limits: {
+			daily: string;
+			monthly: string | null;
+		};
+	};
 }
 
 export interface MentorSummaryResponse {
@@ -383,4 +394,36 @@ export interface SessionReview {
 export interface SessionReviewsResponse {
 	success: boolean;
 	reviews: SessionReview[];
+}
+
+export interface MentorRewardTransaction {
+	id: string;
+	amount: string;
+	type: string;
+	balanceType: string;
+	createdAt: string;
+	reason: string;
+	studentName?: string; // For SPENT
+	studentId?: number; // For SPENT
+	adminName?: string; // For RECEIVED
+	adminId?: number; // For RECEIVED
+}
+
+export interface Pagination {
+	total: number;
+	skip: number;
+	take: number;
+}
+
+export interface PaginatedRewardTransactions {
+	data: MentorRewardTransaction[];
+	pagination: Pagination;
+}
+
+export interface MentorRewardTransactionsResponse {
+	success: boolean;
+	data: {
+		spent: PaginatedRewardTransactions;
+		received: PaginatedRewardTransactions;
+	};
 }

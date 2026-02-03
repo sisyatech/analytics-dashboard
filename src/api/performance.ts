@@ -204,3 +204,30 @@ export const getSessionReviews = async (
 	);
 	return data;
 };
+
+export const getMentorRewardTransactions = async (
+	mentorId: number,
+	skip = 0,
+	take = 50,
+): Promise<import("@/types/performance").MentorRewardTransactionsResponse> => {
+	const { data } = await axiosInstance.post<
+		import("@/types/performance").MentorRewardTransactionsResponse
+	>(API_ENDPOINTS.GET_MENTOR_REWARD_TRANSACTIONS, { mentorId, skip, take });
+	return data;
+};
+
+export const allocateRewardBudget = async (
+	toOwnerId: number,
+	amount: number,
+): Promise<{ success: boolean; message?: string }> => {
+	const { data } = await axiosInstance.post<{ success: boolean; message?: string }>(
+		API_ENDPOINTS.ALLOCATE_REWARD_BUDGET,
+		{
+			toOwnerType: "MENTOR",
+			adminId: 1,
+			toOwnerId,
+			amount,
+		},
+	);
+	return data;
+};

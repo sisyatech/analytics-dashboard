@@ -3,6 +3,7 @@ import {
 	getActiveMentors,
 	getMentorPerformanceDoubts,
 	getMentorPerformanceReviews,
+	getMentorPerformanceSessions,
 	getMentorPerformanceSummary,
 	getPerformanceAttendance,
 	getPerformanceCoins,
@@ -159,6 +160,19 @@ export const useMentorPerformanceDoubts = (mentorId: number | null) => {
 				throw new Error("mentorId is required");
 			}
 			return getMentorPerformanceDoubts(mentorId);
+		},
+		enabled: Boolean(mentorId),
+	});
+};
+
+export const useMentorPerformanceSessions = (mentorId: number | null) => {
+	return useQuery({
+		queryKey: ["mentor-performance-sessions", mentorId],
+		queryFn: () => {
+			if (!mentorId) {
+				throw new Error("mentorId is required");
+			}
+			return getMentorPerformanceSessions(mentorId);
 		},
 		enabled: Boolean(mentorId),
 	});

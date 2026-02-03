@@ -3,11 +3,13 @@ import { motion } from "motion/react";
 import { useState } from "react";
 import { MentorDoubtsView } from "@/components/admin/Reports/MentorDoubtsView";
 import { MentorReviewsView } from "@/components/admin/Reports/MentorReviewsView";
+import { MentorSessionsView } from "@/components/admin/Reports/MentorSessionsView";
 import { MentorSummaryView } from "@/components/admin/Reports/MentorSummaryView";
 import { Button } from "@/components/ui/button";
 import {
 	useMentorPerformanceDoubts,
 	useMentorPerformanceReviews,
+	useMentorPerformanceSessions,
 	useMentorPerformanceSummary,
 } from "@/hooks/analytics/usePerformance";
 import type { Mentor } from "@/types/performance";
@@ -18,14 +20,19 @@ interface MentorPerformanceReportProps {
 }
 
 export const MentorPerformanceReport = ({ mentor, onBack }: MentorPerformanceReportProps) => {
-	const [activeTab, setActiveTab] = useState<"summary" | "reviews" | "doubts">("summary");
+	const [activeTab, setActiveTab] = useState<"summary" | "sessions" | "reviews" | "doubts">(
+		"summary",
+	);
 
 	// Performance Data
 	const { data: summaryData, isLoading: isLoadingSummary } = useMentorPerformanceSummary(mentor.id);
+	const { data: sessionsData, isLoading: isLoadingSessions } = useMentorPerformanceSessions(
+		mentor.id,
+	);
 	const { data: reviewsData, isLoading: isLoadingReviews } = useMentorPerformanceReviews(mentor.id);
 	const { data: doubtsData, isLoading: isLoadingDoubts } = useMentorPerformanceDoubts(mentor.id);
 
-	const isLoading = isLoadingSummary || isLoadingReviews || isLoadingDoubts;
+	const isLoading = isLoadingSummary || isLoadingSessions || isLoadingReviews || isLoadingDoubts;
 
 	return (
 		<div className="space-y-6">
@@ -72,7 +79,7 @@ export const MentorPerformanceReport = ({ mentor, onBack }: MentorPerformanceRep
 
 			{/* Tabs */}
 			<div className="flex items-center gap-2 p-1 rounded-xl bg-neutral-100 dark:bg-neutral-800 w-fit">
-				{(["summary", "reviews", "doubts"] as const).map((tab) => (
+				{(["summary", "sessions", "reviews", "doubts"] as const).map((tab) => (
 					<button
 						key={tab}
 						type="button"
@@ -104,6 +111,9 @@ export const MentorPerformanceReport = ({ mentor, onBack }: MentorPerformanceRep
 					>
 						{activeTab === "summary" && summaryData && (
 							<MentorSummaryView summary={summaryData.summary} />
+						)}
+						{activeTab === "sessions" && sessionsData && (
+							<MentorSessionsView data={sessionsData.sessions} />
 						)}
 						{activeTab === "reviews" && reviewsData && (
 							<MentorReviewsView data={reviewsData.reviewDetails} />

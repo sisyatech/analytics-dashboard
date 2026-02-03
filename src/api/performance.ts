@@ -6,6 +6,7 @@ import type {
 	HomeworkDetailsResponse,
 	MentorDoubtDetailsResponse,
 	MentorReviewDetailsResponse,
+	MentorSessionsResponse,
 	MentorSummaryResponse,
 	MentorsResponse,
 	PerformanceSummaryResponse,
@@ -170,6 +171,36 @@ export const getMentorPerformanceDoubts = async (
 	const { data } = await axiosInstance.post<MentorDoubtDetailsResponse>(
 		API_ENDPOINTS.GET_MENTOR_PERFORMANCE_DOUBTS,
 		{ mentorId },
+	);
+	return data;
+};
+
+export const getMentorPerformanceSessions = async (
+	mentorId: number,
+): Promise<MentorSessionsResponse> => {
+	const { data } = await axiosInstance.post<MentorSessionsResponse>(
+		API_ENDPOINTS.GET_SESSIONS_BY_MENTOR,
+		{ mentorId },
+	);
+	return data;
+};
+
+export const getPresentStudents = async (
+	sessionId: number,
+): Promise<import("@/types/performance").PresentStudentsResponse> => {
+	const { data } = await axiosInstance.post<import("@/types/performance").PresentStudentsResponse>(
+		API_ENDPOINTS.GET_PRESENT_STUDENTS,
+		{ sessionId },
+	);
+	return data;
+};
+
+export const getSessionReviews = async (
+	sessionId: number,
+): Promise<import("@/types/performance").SessionReviewsResponse> => {
+	const { data } = await axiosInstance.post<import("@/types/performance").SessionReviewsResponse>(
+		API_ENDPOINTS.GET_SESSION_REVIEWS,
+		{ sessionId },
 	);
 	return data;
 };

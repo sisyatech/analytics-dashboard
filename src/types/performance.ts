@@ -325,3 +325,62 @@ export interface MentorDoubtDetailsResponse {
 	success: boolean;
 	doubtDetails: MentorDoubtItem[];
 }
+
+export interface MentorSession {
+	id: number;
+	title: string;
+	startTime: string;
+	endTime: string;
+	courseId: number;
+	courseName: string;
+	grade: string;
+	subjectName: string;
+	isDone: boolean;
+	isGoingOn: boolean;
+	hasHomework: boolean;
+	analytics: {
+		totalStudentsJoined: number;
+		avgRating: number;
+		reviewCount: number;
+		isTakenByAssignedMentor: boolean;
+		actualStartTime: string;
+		actualEndTime: string;
+		actualDuration: number;
+		teacherDuration: number;
+	};
+}
+
+export interface MentorSessionsResponse {
+	success: boolean;
+	sessions: MentorSession[];
+}
+
+export interface PresentStudent {
+	id: number;
+	name: string;
+	phone: string;
+}
+
+export interface PresentStudentsResponse {
+	success: boolean;
+	students: PresentStudent[];
+}
+
+export interface SessionReview {
+	id: number;
+	rating: number;
+	techIssue: string;
+	sessionIssue: string;
+	general: string | null;
+	createdAt: string;
+	student: {
+		id: number;
+		name: string;
+		email: string;
+	};
+}
+
+export interface SessionReviewsResponse {
+	success: boolean;
+	reviews: SessionReview[];
+}

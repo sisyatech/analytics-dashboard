@@ -36,6 +36,9 @@ export const API_ENDPOINTS = {
 	GET_MENTOR_PERFORMANCE_SUMMARY: "/rkadmin/performance/mentor/summary",
 	GET_MENTOR_PERFORMANCE_REVIEWS: "/rkadmin/performance/mentor/reviews",
 	GET_MENTOR_PERFORMANCE_DOUBTS: "/rkadmin/performance/mentor/doubts",
+	GET_SESSIONS_BY_MENTOR: "/rkadmin/get_sessions_by_mentor",
+	GET_PRESENT_STUDENTS: "/rkadmin/get_present_students",
+	GET_SESSION_REVIEWS: "/rkadmin/get_session_reviews",
 } as const;
 
 export const GRADES = Array.from({ length: 12 }, (_, i) => (i + 1).toString());

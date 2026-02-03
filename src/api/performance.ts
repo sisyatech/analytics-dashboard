@@ -4,6 +4,10 @@ import type {
 	AttendanceDetailsResponse,
 	CoinsTransactionsResponse,
 	HomeworkDetailsResponse,
+	MentorDoubtDetailsResponse,
+	MentorReviewDetailsResponse,
+	MentorSummaryResponse,
+	MentorsResponse,
 	PerformanceSummaryResponse,
 	QuizDetailsResponse,
 	StudentsResponse,
@@ -130,6 +134,42 @@ export const getPerformanceReviews = async (
 	const { data } = await axiosInstance.post<ReviewDetailsResponse>(
 		API_ENDPOINTS.GET_PERFORMANCE_REVIEWS,
 		{ endUsersId, bigCourseId },
+	);
+	return data;
+};
+
+// Mentor API Functions
+export const getActiveMentors = async (): Promise<MentorsResponse> => {
+	const { data } = await axiosInstance.post<MentorsResponse>(API_ENDPOINTS.GET_ACTIVE_MENTORS);
+	return data;
+};
+
+export const getMentorPerformanceSummary = async (
+	mentorId: number,
+): Promise<MentorSummaryResponse> => {
+	const { data } = await axiosInstance.post<MentorSummaryResponse>(
+		API_ENDPOINTS.GET_MENTOR_PERFORMANCE_SUMMARY,
+		{ mentorId },
+	);
+	return data;
+};
+
+export const getMentorPerformanceReviews = async (
+	mentorId: number,
+): Promise<MentorReviewDetailsResponse> => {
+	const { data } = await axiosInstance.post<MentorReviewDetailsResponse>(
+		API_ENDPOINTS.GET_MENTOR_PERFORMANCE_REVIEWS,
+		{ mentorId },
+	);
+	return data;
+};
+
+export const getMentorPerformanceDoubts = async (
+	mentorId: number,
+): Promise<MentorDoubtDetailsResponse> => {
+	const { data } = await axiosInstance.post<MentorDoubtDetailsResponse>(
+		API_ENDPOINTS.GET_MENTOR_PERFORMANCE_DOUBTS,
+		{ mentorId },
 	);
 	return data;
 };

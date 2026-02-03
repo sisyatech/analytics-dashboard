@@ -1,5 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import {
+	getActiveMentors,
+	getMentorPerformanceDoubts,
+	getMentorPerformanceReviews,
+	getMentorPerformanceSummary,
 	getPerformanceAttendance,
 	getPerformanceCoins,
 	getPerformanceHomework,
@@ -111,5 +115,51 @@ export const usePerformanceReviews = (studentId: number | null, courseId: number
 			return getPerformanceReviews(studentId, courseId);
 		},
 		enabled: Boolean(studentId && courseId),
+	});
+};
+
+export const useActiveMentors = () => {
+	return useQuery({
+		queryKey: ["active-mentors"],
+		queryFn: getActiveMentors,
+	});
+};
+
+export const useMentorPerformanceSummary = (mentorId: number | null) => {
+	return useQuery({
+		queryKey: ["mentor-performance-summary", mentorId],
+		queryFn: () => {
+			if (!mentorId) {
+				throw new Error("mentorId is required");
+			}
+			return getMentorPerformanceSummary(mentorId);
+		},
+		enabled: Boolean(mentorId),
+	});
+};
+
+export const useMentorPerformanceReviews = (mentorId: number | null) => {
+	return useQuery({
+		queryKey: ["mentor-performance-reviews", mentorId],
+		queryFn: () => {
+			if (!mentorId) {
+				throw new Error("mentorId is required");
+			}
+			return getMentorPerformanceReviews(mentorId);
+		},
+		enabled: Boolean(mentorId),
+	});
+};
+
+export const useMentorPerformanceDoubts = (mentorId: number | null) => {
+	return useQuery({
+		queryKey: ["mentor-performance-doubts", mentorId],
+		queryFn: () => {
+			if (!mentorId) {
+				throw new Error("mentorId is required");
+			}
+			return getMentorPerformanceDoubts(mentorId);
+		},
+		enabled: Boolean(mentorId),
 	});
 };

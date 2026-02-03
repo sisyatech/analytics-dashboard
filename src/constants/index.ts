@@ -11,6 +11,7 @@ export const ROUTES = {
 	USERS: "/admin/users",
 	SETTINGS: "/settings",
 	STUDENT_REPORT: "/admin/student-report",
+	MENTOR_REPORT: "/admin/mentor-report",
 } as const;
 
 export const API_BASE_URL = "https://sisyaclass.xyz";
@@ -31,6 +32,10 @@ export const API_ENDPOINTS = {
 	GET_PERFORMANCE_HOMEWORK: "/rkadmin/performance/homework",
 	GET_PERFORMANCE_COINS: "/rkadmin/performance/coins",
 	GET_PERFORMANCE_REVIEWS: "/rkadmin/performance/reviews",
+	GET_ACTIVE_MENTORS: "/rkadmin/get_active_mentors",
+	GET_MENTOR_PERFORMANCE_SUMMARY: "/rkadmin/performance/mentor/summary",
+	GET_MENTOR_PERFORMANCE_REVIEWS: "/rkadmin/performance/mentor/reviews",
+	GET_MENTOR_PERFORMANCE_DOUBTS: "/rkadmin/performance/mentor/doubts",
 } as const;
 
 export const GRADES = Array.from({ length: 12 }, (_, i) => (i + 1).toString());

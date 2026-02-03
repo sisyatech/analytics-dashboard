@@ -8,6 +8,19 @@ export interface Student {
 	joinedAt: string;
 }
 
+export interface Mentor {
+	id: number;
+	uuid: string;
+	name: string;
+	email: string;
+	phone: string;
+}
+
+export interface MentorsResponse {
+	success: boolean;
+	mentors: Mentor[];
+}
+
 export interface StudentsResponse {
 	success: boolean;
 	students: Student[];
@@ -250,4 +263,65 @@ export interface ReviewDetailsResponse {
 		aiRatings: AIRating[];
 		summary: ReviewSummary;
 	};
+}
+
+// Mentor Performance Types
+export interface MentorSummary {
+	sessions: {
+		total: number;
+		avgRating: number;
+	};
+	doubts: {
+		assigned: number;
+		solved: number;
+		solveRate: number;
+		avgRating: number;
+	};
+	ratings: {
+		mentorAvgRating: number;
+		overallAvgRating: number;
+		totalReviews: number;
+	};
+}
+
+export interface MentorSummaryResponse {
+	success: boolean;
+	summary: MentorSummary;
+}
+
+export interface MentorReviewItem {
+	id: number;
+	rating: number;
+	comment: string | null;
+	studentName: string;
+	sessionTitle?: string;
+	doubtDescription?: string;
+	date: string;
+	type: "SESSION" | "DOUBT" | "DIRECT";
+}
+
+export interface MentorReviewDetailsResponse {
+	success: boolean;
+	reviewDetails: {
+		sessionFeedbacks: MentorReviewItem[];
+		doubtReviews: MentorReviewItem[];
+		mentorRatings: MentorReviewItem[];
+	};
+}
+
+export interface MentorDoubtItem {
+	doubtId: number;
+	description: string;
+	subject: string;
+	topic: string;
+	status: number;
+	studentName: string;
+	createdAt: string;
+	rating: number | null;
+	reviewComment: string | null;
+}
+
+export interface MentorDoubtDetailsResponse {
+	success: boolean;
+	doubtDetails: MentorDoubtItem[];
 }

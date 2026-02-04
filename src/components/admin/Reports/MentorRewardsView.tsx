@@ -57,7 +57,7 @@ const TransactionCard = ({
 						</span>
 					</div>
 					<p
-						className="text-xs text-neutral-500 line-clamp-1 max-w-[250px] sm:max-w-md"
+						className="text-xs text-neutral-500 line-clamp-1 max-w-62.5 sm:max-w-md"
 						title={transaction.reason}
 					>
 						{transaction.reason}

@@ -11,8 +11,8 @@ import { format, parseISO } from "date-fns";
 import { motion } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { MentorSession } from "@/types/performance";
-import { SessionReviewsModal } from "./SessionReviewsModal";
-import { StudentListModal } from "./StudentListModal";
+import { SessionReviewsModal } from "../shared/SessionReviewsModal";
+import { StudentListModal } from "../shared/StudentListModal";
 
 interface MentorSessionsViewProps {
 	data: MentorSession[];

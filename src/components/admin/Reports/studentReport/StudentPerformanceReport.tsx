@@ -2,12 +2,6 @@ import { IconArrowLeft, IconCalendar, IconLoader, IconUser } from "@tabler/icons
 import { format, parseISO } from "date-fns";
 import { motion } from "motion/react";
 import { useState } from "react";
-import { AssessmentsView } from "@/components/admin/Reports/AssessmentsView";
-import { AttendanceView } from "@/components/admin/Reports/AttendanceView";
-import { CoinsView } from "@/components/admin/Reports/CoinsView";
-import { HomeworkView } from "@/components/admin/Reports/HomeworkView";
-import { PerformanceSummary } from "@/components/admin/Reports/PerformanceSummary";
-import { ReviewsView } from "@/components/admin/Reports/ReviewsView";
 import { Button } from "@/components/ui/button";
 import {
 	usePerformanceAttendance,
@@ -19,6 +13,12 @@ import {
 	usePerformanceTests,
 } from "@/hooks/analytics/usePerformance";
 import type { Student } from "@/types/performance";
+import { AssessmentsView } from "./AssessmentsView";
+import { AttendanceView } from "./AttendanceView";
+import { CoinsView } from "./CoinsView";
+import { HomeworkView } from "./HomeworkView";
+import { PerformanceSummary } from "./PerformanceSummary";
+import { ReviewsView } from "./ReviewsView";
 
 interface StudentPerformanceReportProps {
 	student: Student;

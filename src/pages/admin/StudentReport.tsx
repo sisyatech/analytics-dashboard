@@ -7,8 +7,8 @@ import {
 } from "@tabler/icons-react";
 import { motion } from "motion/react";
 import { useMemo, useState } from "react";
-import { StudentAvatar } from "@/components/admin/Reports/StudentAvatar";
-import { StudentPerformanceReport } from "@/components/admin/Reports/StudentPerformanceReport";
+import { StudentAvatar } from "@/components/admin/Reports/shared/StudentAvatar";
+import { StudentPerformanceReport } from "@/components/admin/Reports/studentReport/StudentPerformanceReport";
 import { Input } from "@/components/ui/input";
 import {
 	Select,

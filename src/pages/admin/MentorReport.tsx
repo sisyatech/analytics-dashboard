@@ -7,7 +7,7 @@ import {
 } from "@tabler/icons-react";
 import { motion } from "motion/react";
 import { useMemo, useState } from "react";
-import { MentorPerformanceReport } from "@/components/admin/Reports/MentorPerformanceReport";
+import { MentorPerformanceReport } from "@/components/admin/Reports/teacherReport/MentorPerformanceReport";
 import { Input } from "@/components/ui/input";
 import { useActiveMentors } from "@/hooks/analytics/usePerformance";
 import type { Mentor } from "@/types/performance";

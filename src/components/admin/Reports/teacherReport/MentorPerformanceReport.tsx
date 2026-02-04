@@ -1,11 +1,6 @@
 import { IconArrowLeft, IconCoin, IconInfoCircle, IconLoader } from "@tabler/icons-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
-import { MentorDoubtsView } from "@/components/admin/Reports/MentorDoubtsView";
-import { MentorReviewsView } from "@/components/admin/Reports/MentorReviewsView";
-import { MentorRewardsView } from "@/components/admin/Reports/MentorRewardsView";
-import { MentorSessionsView } from "@/components/admin/Reports/MentorSessionsView";
-import { MentorSummaryView } from "@/components/admin/Reports/MentorSummaryView";
 import { Button } from "@/components/ui/button";
 import {
 	useAllocateRewardBudget,
@@ -16,6 +11,11 @@ import {
 	useMentorRewardTransactions,
 } from "@/hooks/analytics/usePerformance";
 import type { Mentor } from "@/types/performance";
+import { MentorDoubtsView } from "./MentorDoubtsView";
+import { MentorReviewsView } from "./MentorReviewsView";
+import { MentorRewardsView } from "./MentorRewardsView";
+import { MentorSessionsView } from "./MentorSessionsView";
+import { MentorSummaryView } from "./MentorSummaryView";
 
 interface MentorPerformanceReportProps {
 	mentor: Mentor;

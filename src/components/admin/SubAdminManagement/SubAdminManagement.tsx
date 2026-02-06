@@ -2,7 +2,7 @@ import { IconUsers } from "@tabler/icons-react";
 import { useState } from "react";
 import { useSubAdmins } from "@/hooks/admin/useSubAdmin";
 import type { SubAdmin } from "@/types/subadmin";
-import { SubAdminPermissionDialog } from "./SubAdminPermissionDialog";
+import { SubAdminPermissionDialog } from "./SubAdminPermissionDialog.tsx";
 
 export function SubAdminManagement() {
 	const { data, isLoading, error } = useSubAdmins();

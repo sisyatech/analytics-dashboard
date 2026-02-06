@@ -134,3 +134,15 @@ export interface RatingsDistributionResponse {
 		mentorRatings: number[];
 	};
 }
+
+export interface RecentActivityItem {
+	type: "HOMEWORK_CREATED" | "HOMEWORK_SUBMITTED" | "USER_SIGNUP" | "SESSION_COMPLETED";
+	timestamp: string;
+	description: string;
+	metadata: Record<string, unknown>;
+}
+
+export interface RecentActivityResponse {
+	success: boolean;
+	data: RecentActivityItem[];
+}

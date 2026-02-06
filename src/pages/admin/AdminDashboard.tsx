@@ -7,6 +7,7 @@ import {
 	EnrollmentTrendChart,
 	MentorLeaderboard,
 	QuickActions,
+	RecentActivity,
 	SessionTrendChart,
 } from "@/components/admin/Dashboard";
 import { useDashboardOverview } from "@/hooks/admin/useDashboardStats";
@@ -96,20 +97,25 @@ export default function AdminDashboard() {
 				</div>
 			</div>
 
-			{/* Row 4: Session Analytics & Doubts */}
-			<div className="grid gap-6 lg:grid-cols-2">
-				<SessionTrendChart />
-				<DoubtAnalyticsChart />
+			{/* Row 4: Recent Activity & Session Analytics */}
+			<div className="grid gap-6 lg:grid-cols-3">
+				<div className="lg:col-span-1">
+					<RecentActivity />
+				</div>
+				<div className="lg:col-span-2">
+					<SessionTrendChart />
+				</div>
 			</div>
 
-			{/* Row 4: Tables */}
-			<div className="grid gap-6 lg:grid-cols-3">
-				<div className="lg:col-span-2">
-					<CoursePerformanceTable />
-				</div>
-				<div className="lg:col-span-1">
-					<MentorLeaderboard />
-				</div>
+			{/* Row 5: Doubt Analytics & Mentor Leaderboard */}
+			<div className="grid gap-6 lg:grid-cols-2">
+				<DoubtAnalyticsChart />
+				<MentorLeaderboard />
+			</div>
+
+			{/* Row 6: Tables */}
+			<div className="grid gap-6">
+				<CoursePerformanceTable />
 			</div>
 		</div>
 	);

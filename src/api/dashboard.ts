@@ -8,6 +8,7 @@ import type {
 	EnrollmentTrendResponse,
 	MentorPerformanceResponse,
 	RatingsDistributionResponse,
+	RecentActivityResponse,
 	SessionTrendResponse,
 } from "@/types/dashboard";
 
@@ -63,6 +64,13 @@ export const getDoubtTrends = async (): Promise<DoubtTrendResponse> => {
 export const getRatingsDistribution = async (): Promise<RatingsDistributionResponse> => {
 	const { data } = await axiosInstance.post<RatingsDistributionResponse>(
 		API_ENDPOINTS.DASHBOARD_RATINGS_DISTRIBUTION,
+	);
+	return data;
+};
+
+export const getRecentActivity = async (): Promise<RecentActivityResponse> => {
+	const { data } = await axiosInstance.post<RecentActivityResponse>(
+		API_ENDPOINTS.DASHBOARD_ACTIVITY_RECENT,
 	);
 	return data;
 };

@@ -7,6 +7,7 @@ import {
 	getEnrollmentTrends,
 	getMentorPerformance,
 	getRatingsDistribution,
+	getRecentActivity,
 	getSessionTrends,
 } from "@/api/dashboard";
 
@@ -71,5 +72,13 @@ export const useRatingsDistribution = () => {
 		queryKey: ["dashboardRatings"],
 		queryFn: getRatingsDistribution,
 		staleTime: 1000 * 60 * 5,
+	});
+};
+
+export const useRecentActivity = () => {
+	return useQuery({
+		queryKey: ["dashboardActivity"],
+		queryFn: getRecentActivity,
+		staleTime: 1000 * 60 * 1, // 1 minute stale time for activity
 	});
 };

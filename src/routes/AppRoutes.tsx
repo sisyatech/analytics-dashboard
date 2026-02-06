@@ -5,8 +5,6 @@ import { ProtectedRoute } from "@/components/shared/ProtectedRoute";
 import { ROUTES } from "@/constants";
 import { useAutoLogout } from "@/hooks/useAutoLogout";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
-import AIDoubtDetail from "@/pages/admin/AI/AIDoubtDetail";
-import AIReview from "@/pages/admin/AI/AIReview";
 
 import AttendancePage from "@/pages/admin/Attendance";
 import CourseReport from "@/pages/admin/CourseReport";
@@ -72,23 +70,6 @@ const AppRoutes = () => {
 						element={
 							<ProtectedRoute roles={["admin", "subadmin"]} permissionKey="course_report_access">
 								<CourseReport />
-							</ProtectedRoute>
-						}
-					/>
-
-					<Route
-						path={ROUTES.ADMIN_AI_DOUBT_DETAIL}
-						element={
-							<ProtectedRoute roles={["admin", "subadmin"]} permissionKey="ai_doubt_detail">
-								<AIDoubtDetail />
-							</ProtectedRoute>
-						}
-					/>
-					<Route
-						path={ROUTES.ADMIN_AI_REVIEW}
-						element={
-							<ProtectedRoute roles={["admin", "subadmin"]} permissionKey="ai_review">
-								<AIReview />
 							</ProtectedRoute>
 						}
 					/>

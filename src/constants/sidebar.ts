@@ -44,25 +44,6 @@ export const sidebarConfig: SidebarNavItem[] = [
 		path: ROUTES.COURSE_REPORT,
 	},
 	{
-		label: "AI",
-		icon: Icons.IconRobot,
-		roles: ["admin"],
-		permissionKey: "ai_access",
-		expandable: true,
-		subItems: [
-			{
-				label: "AI Doubt Detail",
-				path: ROUTES.ADMIN_AI_DOUBT_DETAIL,
-				permissionKey: "ai_doubt_detail",
-			},
-			{
-				label: "AI Review",
-				path: ROUTES.ADMIN_AI_REVIEW,
-				permissionKey: "ai_review",
-			},
-		],
-	},
-	{
 		label: "Logout",
 		icon: Icons.IconArrowLeft,
 		roles: ["admin", "subadmin"],

@@ -1,11 +1,11 @@
 import { Navigate, Route, Routes } from "react-router-dom";
+import { SubAdminManagement } from "@/components/admin/SubAdminManagement";
 import { DashboardLayout } from "@/components/shared/DashboardLayout";
 import ErrorBoundary from "@/components/shared/ErrorBoundary";
 import { ProtectedRoute } from "@/components/shared/ProtectedRoute";
 import { ROUTES } from "@/constants";
 import { useAutoLogout } from "@/hooks/useAutoLogout";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
-
 import AttendancePage from "@/pages/admin/Attendance";
 import CourseReport from "@/pages/admin/CourseReport";
 import MentorReport from "@/pages/admin/MentorReport";
@@ -70,6 +70,14 @@ const AppRoutes = () => {
 						element={
 							<ProtectedRoute roles={["admin", "subadmin"]} permissionKey="course_report_access">
 								<CourseReport />
+							</ProtectedRoute>
+						}
+					/>
+					<Route
+						path={ROUTES.SUBADMIN_MANAGEMENT}
+						element={
+							<ProtectedRoute roles={["admin"]}>
+								<SubAdminManagement />
 							</ProtectedRoute>
 						}
 					/>

@@ -13,6 +13,7 @@ export const ROUTES = {
 	STUDENT_REPORT: "/admin/student-report",
 	MENTOR_REPORT: "/admin/mentor-report",
 	COURSE_REPORT: "/admin/course-report",
+	SUBADMIN_MANAGEMENT: "/admin/subadmin-management",
 } as const;
 
 export const API_BASE_URL = "https://staging.sisyaclass.net";
@@ -47,6 +48,8 @@ export const API_ENDPOINTS = {
 	GET_COURSE_PERFORMANCE_HOMEWORK: "/rkadmin/performance/course/homework",
 	GET_COURSE_PERFORMANCE_REVIEWS: "/rkadmin/performance/course/reviews",
 	GET_COURSE_PERFORMANCE_TESTS: "/rkadmin/performance/course/tests",
+	GET_ALL_SUBADMINS: "/rkadmin/get_all_subadmin",
+	UPDATE_SUBADMIN: "/rkadmin/update_subadmin",
 } as const;
 
 export const GRADES = Array.from({ length: 12 }, (_, i) => (i + 1).toString());

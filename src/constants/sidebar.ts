@@ -44,6 +44,12 @@ export const sidebarConfig: SidebarNavItem[] = [
 		path: ROUTES.COURSE_REPORT,
 	},
 	{
+		label: "SubAdmin Management",
+		icon: Icons.IconUsers,
+		roles: ["admin"],
+		path: ROUTES.SUBADMIN_MANAGEMENT,
+	},
+	{
 		label: "Logout",
 		icon: Icons.IconArrowLeft,
 		roles: ["admin", "subadmin"],

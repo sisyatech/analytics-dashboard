@@ -37,6 +37,13 @@ export const sidebarConfig: SidebarNavItem[] = [
 		path: ROUTES.MENTOR_REPORT,
 	},
 	{
+		label: "Course Report",
+		icon: Icons.IconBooks,
+		roles: ["admin"],
+		permissionKey: "course_report_access",
+		path: ROUTES.COURSE_REPORT,
+	},
+	{
 		label: "AI",
 		icon: Icons.IconRobot,
 		roles: ["admin"],

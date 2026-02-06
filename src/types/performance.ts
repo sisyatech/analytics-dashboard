@@ -269,6 +269,7 @@ export interface ReviewDetailsResponse {
 export interface MentorSummary {
 	sessions: {
 		total: number;
+		totalDurationMinutes: number;
 		avgRating: number;
 	};
 	doubts: {
@@ -426,4 +427,111 @@ export interface MentorRewardTransactionsResponse {
 		spent: PaginatedRewardTransactions;
 		received: PaginatedRewardTransactions;
 	};
+}
+
+// Course Performance Types
+export interface CourseSummary {
+	enrolledStudents: number;
+	sessions: {
+		totalDone: number;
+		totalDurationMinutes: number;
+		avgRating: number;
+	};
+	homework: {
+		totalAssigned: number;
+	};
+	tests: {
+		totalAssigned: number;
+	};
+	courseRating: number;
+}
+
+export interface CourseSummaryResponse {
+	success: boolean;
+	summary: CourseSummary;
+}
+
+export interface CourseSession {
+	id: number;
+	title: string;
+	startTime: string;
+	endTime: string;
+	allocatedTeacher: {
+		id: number;
+		name: string;
+	};
+	actualTeacher: {
+		id: number;
+		name: string;
+	} | null;
+	subjectName: string;
+	isDone: boolean;
+	isGoingOn: boolean;
+	hasHomework: boolean;
+	analytics: {
+		totalStudentsJoined: number;
+		avgRating: number;
+		reviewCount: number;
+		actualStartTime: string | null;
+		actualEndTime: string | null;
+		actualDuration: number;
+	};
+}
+
+export interface CourseSessionsResponse {
+	success: boolean;
+	total: number;
+	page: number;
+	limit: number;
+	sessions: CourseSession[];
+}
+
+export interface CourseHomework {
+	homeworkId: number;
+	sessionId: number;
+	sessionName: string;
+	sessionDate: string;
+	totalQuestions: number;
+	submissionCount: number;
+	createdAt: string;
+}
+
+export interface CourseHomeworkResponse {
+	success: boolean;
+	homeworkDetails: CourseHomework[];
+}
+
+export interface CourseReview {
+	id: number;
+	rating: number;
+	comment: string | null;
+	studentName: string;
+	sessionTitle: string;
+	sessionDate: string;
+	techIssue: string;
+	sessionIssue: string;
+	createdAt: string;
+}
+
+export interface CourseReviewsResponse {
+	success: boolean;
+	reviewDetails: CourseReview[];
+}
+
+export interface CourseTest {
+	testId: number;
+	title: string;
+	mode: string;
+	startDate: string;
+	endDate: string;
+	duration: number;
+	totalMarks: number | null;
+	questionCount: number;
+	submissionCount: number;
+	createdAt: string;
+}
+
+export interface CourseTestsResponse {
+	success: boolean;
+	testDetails: CourseTest[];
 }

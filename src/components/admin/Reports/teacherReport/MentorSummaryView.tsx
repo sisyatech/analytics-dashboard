@@ -1,4 +1,4 @@
-import { IconChecks, IconMessages, IconStar, IconUsers } from "@tabler/icons-react";
+import { IconChecks, IconClock, IconMessages, IconStar, IconUsers } from "@tabler/icons-react";
 import { motion } from "motion/react";
 import type { MentorSummary } from "@/types/performance";
 
@@ -7,6 +7,9 @@ interface MentorSummaryViewProps {
 }
 
 export const MentorSummaryView = ({ summary }: MentorSummaryViewProps) => {
+	const totalHours = Math.floor(summary.sessions.totalDurationMinutes / 60);
+	const remainingMinutes = summary.sessions.totalDurationMinutes % 60;
+
 	const stats = [
 		{
 			label: "Total Sessions",
@@ -14,6 +17,13 @@ export const MentorSummaryView = ({ summary }: MentorSummaryViewProps) => {
 			subValue: `${summary.sessions.avgRating} Avg Rating`,
 			icon: IconUsers,
 			color: "blue",
+		},
+		{
+			label: "Total Duration",
+			value: `${summary.sessions.totalDurationMinutes}m`,
+			subValue: `${totalHours}h ${remainingMinutes}m Total`,
+			icon: IconClock,
+			color: "emerald",
 		},
 		{
 			label: "Doubts Solved",
@@ -40,7 +50,7 @@ export const MentorSummaryView = ({ summary }: MentorSummaryViewProps) => {
 
 	return (
 		<div className="space-y-6">
-			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+			<div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
 				{stats.map((stat, index) => (
 					<motion.div
 						key={stat.label}

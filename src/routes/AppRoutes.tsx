@@ -9,6 +9,7 @@ import AIDoubtDetail from "@/pages/admin/AI/AIDoubtDetail";
 import AIReview from "@/pages/admin/AI/AIReview";
 
 import AttendancePage from "@/pages/admin/Attendance";
+import CourseReport from "@/pages/admin/CourseReport";
 import MentorReport from "@/pages/admin/MentorReport";
 import StudentReport from "@/pages/admin/StudentReport";
 import Login from "@/pages/shared/Login";
@@ -63,6 +64,14 @@ const AppRoutes = () => {
 						element={
 							<ProtectedRoute roles={["admin", "subadmin"]} permissionKey="mentor_report_access">
 								<MentorReport />
+							</ProtectedRoute>
+						}
+					/>
+					<Route
+						path={ROUTES.COURSE_REPORT}
+						element={
+							<ProtectedRoute roles={["admin", "subadmin"]} permissionKey="course_report_access">
+								<CourseReport />
 							</ProtectedRoute>
 						}
 					/>

@@ -1,0 +1,11 @@
+export { QuickActions } from "./actions/QuickActions";
+export { DoubtAnalyticsChart } from "./charts/DoubtAnalyticsChart";
+export { EnrollmentTrendChart } from "./charts/EnrollmentTrendChart";
+export { MentorActivityChart } from "./charts/MentorActivityChart";
+export { PerformanceDistributionChart } from "./charts/PerformanceDistributionChart";
+export { SessionTrendChart } from "./charts/SessionTrendChart";
+export { RecentActivity } from "./legacy/RecentActivity";
+export { AssessmentStats } from "./stats/AssessmentStats";
+export { DashboardStatsCards } from "./stats/DashboardStats";
+export { CoursePerformanceTable } from "./tables/CoursePerformanceTable";
+export { MentorLeaderboard } from "./tables/MentorLeaderboard";

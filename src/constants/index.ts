@@ -50,6 +50,15 @@ export const API_ENDPOINTS = {
 	GET_COURSE_PERFORMANCE_TESTS: "/rkadmin/performance/course/tests",
 	GET_ALL_SUBADMINS: "/rkadmin/get_all_subadmin",
 	UPDATE_SUBADMIN: "/rkadmin/update_subadmin",
+	// New Dashboard Specific APIs
+	DASHBOARD_OVERVIEW: "/rkadmin/dashboard/overview",
+	DASHBOARD_TRENDS_ENROLLMENT: "/rkadmin/dashboard/trends/enrollment",
+	DASHBOARD_TRENDS_SESSIONS: "/rkadmin/dashboard/trends/sessions",
+	DASHBOARD_PERFORMANCE_COURSES: "/rkadmin/dashboard/performance/courses",
+	DASHBOARD_ASSESSMENT_COMPLETION: "/rkadmin/dashboard/assessment/completion",
+	DASHBOARD_PERFORMANCE_MENTORS: "/rkadmin/dashboard/performance/mentors",
+	DASHBOARD_TRENDS_DOUBTS: "/rkadmin/dashboard/trends/doubts",
+	DASHBOARD_RATINGS_DISTRIBUTION: "/rkadmin/dashboard/ratings/distribution",
 } as const;
 
 export const GRADES = Array.from({ length: 12 }, (_, i) => (i + 1).toString());

@@ -36,11 +36,11 @@ export function DoubtAnalyticsChart() {
 			</div>
 
 			{isLoading ? (
-				<div className="flex h-[300px] items-center justify-center">
+				<div className="flex h-75 items-center justify-center">
 					<div className="h-8 w-8 animate-spin rounded-full border-4 border-orange-600 border-t-transparent" />
 				</div>
 			) : doubtData.length === 0 ? (
-				<div className="flex h-[300px] items-center justify-center">
+				<div className="flex h-75 items-center justify-center">
 					<p className="text-neutral-500 dark:text-neutral-400">No doubt data available</p>
 				</div>
 			) : (

@@ -16,7 +16,7 @@ export const ROUTES = {
 	SUBADMIN_MANAGEMENT: "/admin/subadmin-management",
 } as const;
 
-export const API_BASE_URL = "https://staging.sisyaclass.net";
+export const API_BASE_URL = "https://sisyaclass.xyz";
 
 export const API_ENDPOINTS = {
 	ADMIN_LOGIN: "/rkadmin/login",

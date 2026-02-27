@@ -11,6 +11,7 @@ export interface SidebarLinkItem {
 export type SidebarSubItem = {
 	label: string;
 	path: string;
+	roles?: UserRole[];
 	permissionKey?: string;
 };
 

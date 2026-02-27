@@ -13,12 +13,19 @@ export function SubAdminPermissionDialog({ subAdmin, onClose }: SubAdminPermissi
 	const { mutate: updateSubAdmin, isPending } = useUpdateSubAdmin();
 	const [permissions, setPermissions] = useState<Record<string, boolean>>({});
 
-	// Extract all unique permission keys from sidebar config
+	// Extract all unique permission keys from sidebar config including subItems
 	const analyticsPermissionKeys = Array.from(
 		new Set(
-			sidebarConfig
-				.filter((item) => item.permissionKey)
-				.map((item) => item.permissionKey as string),
+			sidebarConfig.flatMap((item) => {
+				const keys = [];
+				if (item.permissionKey) keys.push(item.permissionKey);
+				if (item.subItems) {
+					for (const sub of item.subItems) {
+						if (sub.permissionKey) keys.push(sub.permissionKey);
+					}
+				}
+				return keys;
+			}),
 		),
 	);
 
@@ -50,8 +57,14 @@ export function SubAdminPermissionDialog({ subAdmin, onClose }: SubAdminPermissi
 
 	// Get label for permission key from sidebar config
 	const getPermissionLabel = (key: string) => {
-		const item = sidebarConfig.find((item) => item.permissionKey === key);
-		return item?.label || key;
+		for (const item of sidebarConfig) {
+			if (item.permissionKey === key) return item.label;
+			if (item.subItems) {
+				const sub = item.subItems.find((s) => s.permissionKey === key);
+				if (sub) return `${item.label} > ${sub.label}`;
+			}
+		}
+		return key;
 	};
 
 	return (

@@ -22,8 +22,8 @@ const NavItem = ({ link }: { link: SidebarItemMapped }) => {
 	const { open: sidebarOpen } = useSidebar();
 
 	const hasSubItems = link.subItems && link.subItems.length > 0;
-	// Use link.expandable as the primary source of truth, but fallback to subitems presence
-	const isExpandable = link.expandable !== undefined ? link.expandable && hasSubItems : hasSubItems;
+	// Respect the expandable flag if provided, otherwise fallback to subitems presence
+	const isExpandable = link.expandable || hasSubItems;
 
 	if (!isExpandable) {
 		return <SidebarLink link={link} />;
@@ -139,10 +139,19 @@ export function DashboardLayout({
 
 			// Filter sub-items if they exist
 			let subItems = item.subItems;
-			if (subItems && actor === "subadmin") {
+			if (subItems) {
 				subItems = subItems.filter((sub) => {
-					if (!sub.permissionKey) return true;
-					return analyticsPermissions?.[sub.permissionKey];
+					// Role check for sub-items (if roles are defined)
+					const isSubRoleAllowed = !sub.roles || sub.roles.includes(actor);
+					if (!isSubRoleAllowed) return false;
+
+					// Permission check for subadmin:
+					if (actor === "subadmin" && sub.permissionKey) {
+						// Role matches OR permission is granted
+						return (sub.roles?.includes(actor) ?? false) || !!analyticsPermissions?.[sub.permissionKey];
+					}
+
+					return true;
 				});
 			}
 

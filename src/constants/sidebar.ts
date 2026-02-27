@@ -55,10 +55,16 @@ export const sidebarConfig: SidebarNavItem[] = [
 		roles: ["admin", "subadmin"],
 		expandable: true,
 		subItems: [
-			{ label: "Sent", path: ROUTES.ANNOUNCEMENTS_SENT, permissionKey: "announcements_sent" },
+			{
+				label: "Sent",
+				path: ROUTES.ANNOUNCEMENTS_SENT,
+				roles: ["admin", "subadmin"],
+				permissionKey: "announcements_sent",
+			},
 			{
 				label: "History",
 				path: ROUTES.ANNOUNCEMENTS_HISTORY,
+				roles: ["admin", "subadmin"],
 				permissionKey: "announcements_history",
 			},
 		],

@@ -50,9 +50,21 @@ export const sidebarConfig: SidebarNavItem[] = [
 		path: ROUTES.SUBADMIN_MANAGEMENT,
 	},
 	{
+		label: "Announcements",
+		icon: Icons.IconMail, // choose any icon you prefer
+		roles: ["admin", "subadmin"],
+		expandable: true,
+		subItems:  [
+			{label:"Sent", path: ROUTES.ANNOUNCEMENTS_SENT, permissionKey:"announcements_sent"},
+			{label:"History", path: ROUTES.ANNOUNCEMENTS_HISTORY, permissionKey:"announcements_history"},
+		],
+	},
+	{
 		label: "Logout",
 		icon: Icons.IconArrowLeft,
 		roles: ["admin", "subadmin"],
 		path: ROUTES.LOGIN,
 	},
+	
+	
 ];

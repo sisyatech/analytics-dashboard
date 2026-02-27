@@ -47,7 +47,6 @@ export interface StudentAttendance {
 	isLateJoin: boolean;
 	intervals: AttendanceInterval[];
 }
-
 export interface SessionAttendanceResponse {
 	success: boolean;
 	sessionId: number;

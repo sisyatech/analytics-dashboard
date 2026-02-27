@@ -13,6 +13,8 @@ import StudentReport from "@/pages/admin/StudentReport";
 import Login from "@/pages/shared/Login";
 import NotFound from "@/pages/shared/NotFound";
 import SubadminDashboard from "@/pages/subadmin/SubadminDashboard";
+import HistoryAnnouncements from "@/pages/Announcements/history";
+import SentAnnouncemnet from "@/pages/Announcements/sent";
 
 const AppRoutes = () => {
 	useAutoLogout();
@@ -81,7 +83,23 @@ const AppRoutes = () => {
 							</ProtectedRoute>
 						}
 					/>
-				</Route>
+					<Route
+						path={ROUTES.ANNOUNCEMENTS_HISTORY}
+						element={
+							<ProtectedRoute roles={["admin", "subadmin"]}>	
+							<HistoryAnnouncements />
+							</ProtectedRoute>
+						}
+					/>
+					<Route
+						path={ROUTES.ANNOUNCEMENTS_SENT}
+						element={
+							<ProtectedRoute roles={["admin", "subadmin"]}>
+								<SentAnnouncemnet />
+							</ProtectedRoute>
+						}
+					/>
+					</Route>
 
 				{/* 404 Route */}
 				<Route path="*" element={<NotFound />} />

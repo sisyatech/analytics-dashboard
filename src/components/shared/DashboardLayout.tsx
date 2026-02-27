@@ -148,7 +148,9 @@ export function DashboardLayout({
 					// Permission check for subadmin:
 					if (actor === "subadmin" && sub.permissionKey) {
 						// Role matches OR permission is granted
-						return (sub.roles?.includes(actor) ?? false) || !!analyticsPermissions?.[sub.permissionKey];
+						return (
+							(sub.roles?.includes(actor) ?? false) || !!analyticsPermissions?.[sub.permissionKey]
+						);
 					}
 
 					return true;

@@ -51,12 +51,16 @@ export const sidebarConfig: SidebarNavItem[] = [
 	},
 	{
 		label: "Announcements",
-		icon: Icons.IconMail, // choose any icon you prefer
+		icon: Icons.IconMail,
 		roles: ["admin", "subadmin"],
 		expandable: true,
-		subItems:  [
-			{label:"Sent", path: ROUTES.ANNOUNCEMENTS_SENT, permissionKey:"announcements_sent"},
-			{label:"History", path: ROUTES.ANNOUNCEMENTS_HISTORY, permissionKey:"announcements_history"},
+		subItems: [
+			{ label: "Sent", path: ROUTES.ANNOUNCEMENTS_SENT, permissionKey: "announcements_sent" },
+			{
+				label: "History",
+				path: ROUTES.ANNOUNCEMENTS_HISTORY,
+				permissionKey: "announcements_history",
+			},
 		],
 	},
 	{
@@ -65,6 +69,4 @@ export const sidebarConfig: SidebarNavItem[] = [
 		roles: ["admin", "subadmin"],
 		path: ROUTES.LOGIN,
 	},
-	
-	
 ];

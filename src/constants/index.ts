@@ -15,7 +15,7 @@ export const ROUTES = {
 	COURSE_REPORT: "/admin/course-report",
 	SUBADMIN_MANAGEMENT: "/admin/subadmin-management",
 	ANNOUNCEMENTS_HISTORY: "/admin/announcements",
-    ANNOUNCEMENTS_SENT: "/admin/announcements/sent",
+	ANNOUNCEMENTS_SENT: "/admin/announcements/sent",
 } as const;
 
 export const API_BASE_URL = "https://sisyaclass.xyz";

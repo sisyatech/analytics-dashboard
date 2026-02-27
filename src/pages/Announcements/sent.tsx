@@ -1,9 +1,5 @@
 const SentAnnouncemnet = () => {
-  return (
-    <div>
-      Sent Data
-    </div>
-  )
-}
+	return <div>Sent Data</div>;
+};
 
-export default SentAnnouncemnet
+export default SentAnnouncemnet;

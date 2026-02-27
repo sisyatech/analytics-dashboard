@@ -21,7 +21,11 @@ const NavItem = ({ link }: { link: SidebarItemMapped }) => {
 	const [isExpanded, setIsExpanded] = useState(false);
 	const { open: sidebarOpen } = useSidebar();
 
-	if (!link.subItems || link.subItems.length === 0) {
+	const hasSubItems = link.subItems && link.subItems.length > 0;
+	// Use link.expandable as the primary source of truth, but fallback to subitems presence
+	const isExpandable = link.expandable !== undefined ? link.expandable && hasSubItems : hasSubItems;
+
+	if (!isExpandable) {
 		return <SidebarLink link={link} />;
 	}
 
@@ -34,7 +38,13 @@ const NavItem = ({ link }: { link: SidebarItemMapped }) => {
 		>
 			<button
 				type="button"
-				onClick={() => sidebarOpen && setIsExpanded(!isExpanded)}
+				onClick={(e) => {
+					if (sidebarOpen) {
+						// Don't propagate to parent MouseEnter/Leave if we're clicking
+						e.stopPropagation();
+						setIsExpanded(!isExpanded);
+					}
+				}}
 				className={cn(
 					"flex items-center justify-between gap-2 group/sidebar py-2 px-0 w-full hover:cursor-pointer bg-transparent border-none",
 				)}
@@ -68,8 +78,10 @@ const NavItem = ({ link }: { link: SidebarItemMapped }) => {
 						animate={{ height: "auto", opacity: 1 }}
 						exit={{ height: 0, opacity: 0 }}
 						className="flex flex-col gap-1 pl-7 overflow-hidden"
+						// Keep it expanded if we are interacting with sub-items
+						onMouseEnter={() => setIsExpanded(true)}
 					>
-						{link.subItems.map((sub: SidebarSubItem, idx: number) => (
+						{link.subItems?.map((sub: SidebarSubItem, idx: number) => (
 							<SidebarLink
 								// biome-ignore lint/suspicious/noArrayIndexKey: <static the index will not change>
 								key={idx}

@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/chart";
 import type { AttendanceDetail } from "@/types/performance";
 
-const chartConfig ={
+const chartConfig = {
 	duration: {
 		label: "Duration (min)",
 		color: "#3b82f6",

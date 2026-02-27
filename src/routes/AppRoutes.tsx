@@ -5,6 +5,8 @@ import ErrorBoundary from "@/components/shared/ErrorBoundary";
 import { ProtectedRoute } from "@/components/shared/ProtectedRoute";
 import { ROUTES } from "@/constants";
 import { useAutoLogout } from "@/hooks/useAutoLogout";
+import HistoryAnnouncements from "@/pages/Announcements/history";
+import SentAnnouncemnet from "@/pages/Announcements/sent";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AttendancePage from "@/pages/admin/Attendance";
 import CourseReport from "@/pages/admin/CourseReport";
@@ -13,8 +15,6 @@ import StudentReport from "@/pages/admin/StudentReport";
 import Login from "@/pages/shared/Login";
 import NotFound from "@/pages/shared/NotFound";
 import SubadminDashboard from "@/pages/subadmin/SubadminDashboard";
-import HistoryAnnouncements from "@/pages/Announcements/history";
-import SentAnnouncemnet from "@/pages/Announcements/sent";
 
 const AppRoutes = () => {
 	useAutoLogout();
@@ -86,8 +86,8 @@ const AppRoutes = () => {
 					<Route
 						path={ROUTES.ANNOUNCEMENTS_HISTORY}
 						element={
-							<ProtectedRoute roles={["admin", "subadmin"]}>	
-							<HistoryAnnouncements />
+							<ProtectedRoute roles={["admin", "subadmin"]}>
+								<HistoryAnnouncements />
 							</ProtectedRoute>
 						}
 					/>
@@ -99,7 +99,7 @@ const AppRoutes = () => {
 							</ProtectedRoute>
 						}
 					/>
-					</Route>
+				</Route>
 
 				{/* 404 Route */}
 				<Route path="*" element={<NotFound />} />

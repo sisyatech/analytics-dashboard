@@ -1,9 +1,5 @@
 const HistoryAnnouncements = () => {
-  return (
-    <div>
-       History of Announcements
-    </div>
-  )
-}
+	return <div>History of Announcements</div>;
+};
 
-export default HistoryAnnouncements
+export default HistoryAnnouncements;

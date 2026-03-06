@@ -51,18 +51,20 @@ export const sidebarConfig: SidebarNavItem[] = [
 	},
 	{
 		label: "Announcements",
-		icon: Icons.IconMail,
+		icon: Icons.IconSpeakerphone,
 		roles: ["admin", "subadmin"],
 		expandable: true,
 		subItems: [
 			{
 				label: "Sent",
+				icon: Icons.IconSend,
 				path: ROUTES.ANNOUNCEMENTS_SENT,
 				roles: ["admin", "subadmin"],
 				permissionKey: "announcements_sent",
 			},
 			{
 				label: "History",
+				icon: Icons.IconHistory,
 				path: ROUTES.ANNOUNCEMENTS_HISTORY,
 				roles: ["admin", "subadmin"],
 				permissionKey: "announcements_history",

@@ -2,6 +2,7 @@ import { IconChevronDown } from "@tabler/icons-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
+// import Todaydate from "@/components/shared/Todaydate";
 import { APP_NAME, ROUTES } from "@/constants";
 import { sidebarConfig } from "@/constants/sidebar";
 import { cn } from "@/lib/utils";
@@ -81,20 +82,26 @@ const NavItem = ({ link }: { link: SidebarItemMapped }) => {
 						// Keep it expanded if we are interacting with sub-items
 						onMouseEnter={() => setIsExpanded(true)}
 					>
-						{link.subItems?.map((sub: SidebarSubItem, idx: number) => (
-							<SidebarLink
-								// biome-ignore lint/suspicious/noArrayIndexKey: <static the index will not change>
-								key={idx}
-								link={{
-									label: sub.label,
-									href: sub.path,
-									icon: (
-										<div className="w-1.5 h-1.5 rounded-full bg-neutral-400 dark:bg-neutral-500 shrink-0" />
-									),
-								}}
-								className="py-1.5 opacity-80 hover:opacity-100"
-							/>
-						))}
+						{link.subItems?.map((sub: SidebarSubItem) => {
+							//found a bug here, the subitems were not being checked for permissions which caused them to be rendered even if the user didn't have access to them
+							const SubIcon = sub.icon;
+
+							return (
+								<SidebarLink
+									key={sub.path} // Fixed: Using path as key instead of index
+									link={{
+										label: sub.label,
+										href: sub.path,
+										icon: SubIcon ? (
+											<SubIcon className="h-4 w-4 shrink-0" />
+										) : (
+											<div className="w-1.5 h-1.5 rounded-full bg-neutral-400 dark:bg-neutral-500 shrink-0" />
+										),
+									}}
+									className="py-1.5 opacity-80 hover:opacity-100"
+								/>
+							);
+						})}
 					</motion.div>
 				)}
 			</AnimatePresence>
@@ -179,9 +186,8 @@ export function DashboardLayout({
 					<div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
 						{open ? <Logo /> : <LogoIcon />}
 						<div className="mt-6 flex flex-col gap-2">
-							{filteredLinks.map((link, idx) => (
-								// biome-ignore lint/suspicious/noArrayIndexKey: <array-index-key>
-								<NavItem key={idx} link={link} />
+							{filteredLinks.map((link) => (
+								<NavItem key={link.href} link={link} />
 							))}
 						</div>
 					</div>
@@ -247,7 +253,7 @@ const LogoIcon = () => {
 const Dashboard = ({ children }: { children: React.ReactNode }) => {
 	return (
 		<div className="flex flex-1 overflow-hidden">
-			<div className="flex h-full w-full flex-1 flex-col overflow-y-auto rounded-tl-2xl border border-neutral-200 bg-white p-4 md:p-8 dark:border-neutral-700 dark:bg-neutral-900">
+			<div className="relative flex h-full w-full flex-1 flex-col overflow-y-auto rounded-tl-2xl border border-neutral-200 bg-white p-4 md:p-8 dark:border-neutral-700 dark:bg-neutral-900">
 				{children}
 			</div>
 		</div>

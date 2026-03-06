@@ -1,4 +1,4 @@
-import type { ElementType, ReactNode } from "react";
+import type { ReactNode } from "react";
 import type { UserRole } from "@/types/auth";
 
 export interface SidebarLinkItem {
@@ -13,11 +13,12 @@ export type SidebarSubItem = {
 	path: string;
 	roles?: UserRole[];
 	permissionKey?: string;
+	icon?: React.ComponentType<{ className?: string }>;
 };
 
 export type SidebarNavItem = {
 	label: string;
-	icon: ElementType;
+	icon: React.ComponentType<{ className?: string }>;
 	roles: UserRole[];
 	permissionKey?: string;
 	expandable?: boolean;

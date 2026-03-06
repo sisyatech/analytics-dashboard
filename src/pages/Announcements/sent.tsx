@@ -1,5 +1,5 @@
 const SentAnnouncemnet = () => {
-	return <div>Sent Data</div>;
+	return <div>Sent Announcements</div>;
 };
 
 export default SentAnnouncemnet;

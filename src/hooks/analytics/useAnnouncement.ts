@@ -8,11 +8,11 @@ export const useCreateAnnouncement = () => {
 		onSuccess: (data) => {
 			if (data.success) {
 				// We can add a success notification here later if a system exists
-				console.log("Announcement sent successfully:", data.message);
+				//console.log("Announcement sent successfully:", data.message);
 			}
 		},
-		onError: (error) => {
-			console.error("Failed to send announcement:", error);
+		onError: (_error) => {
+			//console.error("Failed to send announcement:", error);
 		},
 	});
 };

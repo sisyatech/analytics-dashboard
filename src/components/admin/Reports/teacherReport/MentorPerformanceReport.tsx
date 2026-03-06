@@ -50,8 +50,8 @@ export const MentorPerformanceReport = ({ mentor, onBack }: MentorPerformanceRep
 		if (window.confirm("Are you sure you want to top up the budget by 500?")) {
 			try {
 				await allocateMutation.mutateAsync({ mentorId: mentor.id, amount: 500 });
-			} catch (error) {
-				console.error("Failed to top up budget:", error);
+			} catch (_error) {
+				//console.error("Failed to top up budget:", error);
 				alert("Failed to top up budget. Please try again.");
 			}
 		}

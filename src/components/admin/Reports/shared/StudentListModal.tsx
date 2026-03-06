@@ -23,8 +23,8 @@ export const StudentListModal = ({ sessionId, isOpen, onClose }: StudentListModa
 					if (response.success) {
 						setStudents(response.students);
 					}
-				} catch (error) {
-					console.error("Failed to fetch present students", error);
+				} catch (_error) {
+					//console.error("Failed to fetch present students", error);
 				} finally {
 					setIsLoading(false);
 				}

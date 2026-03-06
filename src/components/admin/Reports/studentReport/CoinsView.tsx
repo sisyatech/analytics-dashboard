@@ -48,8 +48,8 @@ export const CoinsView = ({ data }: CoinsViewProps) => {
 				const matchesEndDate = endDate ? transactionDate <= endDate : true;
 
 				return matchesSearch && matchesStartDate && matchesEndDate;
-			} catch (e) {
-				console.error("Error processing transaction item:", transaction, e);
+			} catch (_e) {
+				//console.error("Error processing transaction item:", transaction, e);
 				return false;
 			}
 		});

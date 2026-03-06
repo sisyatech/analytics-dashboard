@@ -35,8 +35,8 @@ export function MentorActivityChart() {
 				];
 
 				setData(activityData);
-			} catch (error) {
-				console.error("Error fetching mentor activity:", error);
+			} catch (_error) {
+				//console.error("Error fetching mentor activity:", error);
 				setData([]);
 			} finally {
 				setIsLoading(false);

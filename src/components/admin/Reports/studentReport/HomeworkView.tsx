@@ -41,8 +41,8 @@ export const HomeworkView = ({ data }: HomeworkViewProps) => {
 				const matchesEndDate = endDate ? assignedDate <= endDate : true;
 
 				return matchesSearch && matchesStartDate && matchesEndDate;
-			} catch (e) {
-				console.error("Error processing homework item:", homework, e);
+			} catch (_e) {
+				//console.error("Error processing homework item:", homework, e);
 				return false;
 			}
 		});

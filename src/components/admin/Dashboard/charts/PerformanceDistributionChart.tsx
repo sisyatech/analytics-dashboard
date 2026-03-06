@@ -47,8 +47,8 @@ export function PerformanceDistributionChart() {
 
 				const gradeData = await Promise.all(gradePromises);
 				setData(gradeData);
-			} catch (error) {
-				console.error("Error fetching grade distribution:", error);
+			} catch (_error) {
+				//console.error("Error fetching grade distribution:", error);
 				setData([]);
 			} finally {
 				setIsLoading(false);

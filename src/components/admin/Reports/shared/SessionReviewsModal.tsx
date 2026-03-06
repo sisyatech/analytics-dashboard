@@ -24,8 +24,8 @@ export const SessionReviewsModal = ({ sessionId, isOpen, onClose }: SessionRevie
 					if (response.success) {
 						setReviews(response.reviews);
 					}
-				} catch (error) {
-					console.error("Failed to fetch session reviews", error);
+				} catch (_error) {
+					//console.error("Failed to fetch session reviews", error);
 				} finally {
 					setIsLoading(false);
 				}

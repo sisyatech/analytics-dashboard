@@ -1,12 +1,12 @@
 // biome-ignore-all lint: <already created file -- fixing will break things>
 
 import {
+	IconBook,
 	IconChevronDown,
 	IconChevronUp,
 	IconClock,
 	IconSearch,
 	IconUsers,
-	IconBook,
 } from "@tabler/icons-react";
 import { AnimatePresence, motion } from "motion/react";
 import { Fragment } from "react";

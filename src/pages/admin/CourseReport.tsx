@@ -12,12 +12,20 @@ import {
 } from "@/components/ui/select";
 import { GRADES } from "@/constants";
 import { useCoursesByGrade } from "@/hooks/analytics/useAttendance";
+import { useAuthStore } from "@/store/useAuthStore";
 import type { Course } from "@/types/analytics";
 
 const CourseReport = () => {
 	const [selectedGrade, setSelectedGrade] = useState<string | null>(null);
 	const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
 	const [searchQuery, setSearchQuery] = useState("");
+
+	const { role, gradePermissions } = useAuthStore();
+
+	const filteredGrades =
+		role === "subadmin" && gradePermissions
+			? GRADES.filter((g) => gradePermissions.includes(Number.parseInt(g, 10)))
+			: GRADES;
 
 	const { data: coursesData, isLoading: isLoadingCourses } = useCoursesByGrade(selectedGrade);
 
@@ -69,7 +77,7 @@ const CourseReport = () => {
 							<SelectValue placeholder="Select Grade" />
 						</SelectTrigger>
 						<SelectContent>
-							{GRADES.map((g) => (
+							{filteredGrades.map((g) => (
 								<SelectItem key={g} value={g}>
 									Grade {g}
 								</SelectItem>

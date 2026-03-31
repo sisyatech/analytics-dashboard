@@ -7,6 +7,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { GRADES } from "@/constants";
+import { useAuthStore } from "@/store/useAuthStore";
 import type { Course } from "@/types/analytics";
 
 interface AttendanceFiltersProps {
@@ -26,6 +27,13 @@ export const AttendanceFilters = ({
 	coursesData,
 	isLoadingCourses,
 }: AttendanceFiltersProps) => {
+	const { role, gradePermissions } = useAuthStore();
+
+	const filteredGrades =
+		role === "subadmin" && gradePermissions
+			? GRADES.filter((g) => gradePermissions.includes(Number.parseInt(g, 10)))
+			: GRADES;
+
 	return (
 		<div className="grid grid-cols-1 sm:grid-cols-2 gap-6 p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 shadow-sm">
 			<div className="space-y-3">
@@ -37,7 +45,7 @@ export const AttendanceFilters = ({
 						<SelectValue placeholder="Which grade?" />
 					</SelectTrigger>
 					<SelectContent>
-						{GRADES.map((g) => (
+						{filteredGrades.map((g) => (
 							<SelectItem key={g} value={g}>
 								Grade {g}
 							</SelectItem>

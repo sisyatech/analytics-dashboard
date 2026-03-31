@@ -7,6 +7,7 @@ interface AuthState {
 	token: string | null;
 	role: UserRole | null;
 	analyticsPermissions: Record<string, boolean> | null;
+	gradePermissions: number[] | null;
 	isAuthenticated: boolean;
 
 	// Actions
@@ -15,6 +16,7 @@ interface AuthState {
 		role: UserRole,
 		user: AuthUser["user"],
 		analyticsPermissions?: Record<string, boolean>,
+		gradePermissions?: number[],
 	) => void;
 	logout: () => void;
 }
@@ -26,14 +28,16 @@ export const useAuthStore = create<AuthState>()(
 			token: null,
 			role: null,
 			analyticsPermissions: null,
+			gradePermissions: null,
 			isAuthenticated: false,
 
-			login: (token, role, user, analyticsPermissions) =>
+			login: (token, role, user, analyticsPermissions, gradePermissions) =>
 				set({
 					token,
 					role,
 					user,
 					analyticsPermissions: analyticsPermissions || null,
+					gradePermissions: gradePermissions || null,
 					isAuthenticated: true,
 				}),
 
@@ -42,6 +46,8 @@ export const useAuthStore = create<AuthState>()(
 					user: null,
 					token: null,
 					role: null,
+					analyticsPermissions: null,
+					gradePermissions: null,
 					isAuthenticated: false,
 				}),
 		}),

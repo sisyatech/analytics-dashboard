@@ -1,5 +1,6 @@
 import { IconX } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
+import { GRADES } from "@/constants";
 import { sidebarConfig } from "@/constants/sidebar";
 import { useUpdateSubAdmin } from "@/hooks/admin/useSubAdmin";
 import type { SubAdmin } from "@/types/subadmin";
@@ -12,6 +13,7 @@ interface SubAdminPermissionDialogProps {
 export function SubAdminPermissionDialog({ subAdmin, onClose }: SubAdminPermissionDialogProps) {
 	const { mutate: updateSubAdmin, isPending } = useUpdateSubAdmin();
 	const [permissions, setPermissions] = useState<Record<string, boolean>>({});
+	const [gradePermissions, setGradePermissions] = useState<number[]>([]);
 
 	// Extract all unique permission keys from sidebar config including subItems
 	const analyticsPermissionKeys = Array.from(
@@ -32,6 +34,7 @@ export function SubAdminPermissionDialog({ subAdmin, onClose }: SubAdminPermissi
 	// Initialize permissions from subAdmin data
 	useEffect(() => {
 		setPermissions(subAdmin.analyticsPermissions || {});
+		setGradePermissions(subAdmin.gradePermissions || []);
 	}, [subAdmin]);
 
 	const handleTogglePermission = (key: string) => {
@@ -41,11 +44,18 @@ export function SubAdminPermissionDialog({ subAdmin, onClose }: SubAdminPermissi
 		}));
 	};
 
+	const handleToggleGrade = (grade: number) => {
+		setGradePermissions((prev) =>
+			prev.includes(grade) ? prev.filter((g) => g !== grade) : [...prev, grade],
+		);
+	};
+
 	const handleSave = () => {
 		updateSubAdmin(
 			{
 				id: subAdmin.id,
 				analyticsPermissions: permissions,
+				gradePermissions: gradePermissions,
 			},
 			{
 				onSuccess: () => {
@@ -82,35 +92,62 @@ export function SubAdminPermissionDialog({ subAdmin, onClose }: SubAdminPermissi
 					Manage Permissions: {subAdmin.name}
 				</h2>
 
-				<div className="mb-6">
+				<div className="mb-4">
 					<p className="text-sm text-neutral-600 dark:text-neutral-400">{subAdmin.email}</p>
 				</div>
 
-				<div className="mb-6 max-h-96 overflow-y-auto">
-					<h3 className="mb-3 text-sm font-semibold text-neutral-700 dark:text-neutral-300">
-						Analytics Permissions
-					</h3>
-					<div className="space-y-2">
-						{analyticsPermissionKeys.map((key) => (
-							<label
-								key={key}
-								className="flex cursor-pointer items-center gap-3 rounded-lg border border-neutral-200 p-3 transition-colors hover:bg-neutral-50 dark:border-neutral-700 dark:hover:bg-neutral-700/50"
-							>
-								<input
-									type="checkbox"
-									checked={!!permissions[key]}
-									onChange={() => handleTogglePermission(key)}
-									className="h-4 w-4 rounded border-neutral-300 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-neutral-600 dark:bg-neutral-700"
-								/>
-								<span className="text-sm text-neutral-900 dark:text-white">
-									{getPermissionLabel(key)}
-								</span>
-							</label>
-						))}
+				<div className="max-h-[70vh] overflow-y-auto pr-2">
+					<div className="mb-6">
+						<h3 className="mb-3 text-sm font-semibold text-neutral-700 dark:text-neutral-300">
+							Analytics Permissions
+						</h3>
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+							{analyticsPermissionKeys.map((key) => (
+								<label
+									key={key}
+									className="flex cursor-pointer items-center gap-3 rounded-lg border border-neutral-200 p-3 transition-colors hover:bg-neutral-50 dark:border-neutral-700 dark:hover:bg-neutral-700/50"
+								>
+									<input
+										type="checkbox"
+										checked={!!permissions[key]}
+										onChange={() => handleTogglePermission(key)}
+										className="h-4 w-4 rounded border-neutral-300 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-neutral-600 dark:bg-neutral-700"
+									/>
+									<span className="text-sm text-neutral-900 dark:text-white">
+										{getPermissionLabel(key)}
+									</span>
+								</label>
+							))}
+						</div>
+					</div>
+
+					<div className="mb-6">
+						<h3 className="mb-3 text-sm font-semibold text-neutral-700 dark:text-neutral-300">
+							Grade Permissions
+						</h3>
+						<div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+							{GRADES.map((g) => {
+								const gradeNum = Number.parseInt(g, 10);
+								return (
+									<label
+										key={g}
+										className="flex cursor-pointer flex-col items-center gap-1 rounded-lg border border-neutral-200 p-2 transition-colors hover:bg-neutral-50 dark:border-neutral-700 dark:hover:bg-neutral-700/50"
+									>
+										<input
+											type="checkbox"
+											checked={gradePermissions.includes(gradeNum)}
+											onChange={() => handleToggleGrade(gradeNum)}
+											className="h-4 w-4 rounded border-neutral-300 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-neutral-600 dark:bg-neutral-700"
+										/>
+										<span className="text-xs text-neutral-900 dark:text-white">Grade {g}</span>
+									</label>
+								);
+							})}
+						</div>
 					</div>
 				</div>
 
-				<div className="flex justify-end gap-3">
+				<div className="flex justify-end gap-3 mt-4">
 					<button
 						type="button"
 						onClick={onClose}

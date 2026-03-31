@@ -3,6 +3,7 @@ import { API_ENDPOINTS } from "@/constants";
 import type {
 	AttendanceDetailsResponse,
 	CoinsTransactionsResponse,
+	CourseSessionsResponse,
 	HomeworkDetailsResponse,
 	MentorDoubtDetailsResponse,
 	MentorReviewDetailsResponse,
@@ -15,6 +16,16 @@ import type {
 	TestDetailsResponse,
 } from "@/types/performance";
 import type { ReviewDetailsResponse } from "@/types/reviews";
+
+export const getCoursePerformanceSessions = async (
+	courseId: number,
+): Promise<CourseSessionsResponse> => {
+	const { data } = await axiosInstance.post<CourseSessionsResponse>(
+		API_ENDPOINTS.GET_COURSE_PERFORMANCE_SESSIONS,
+		{ bigCourseId: courseId },
+	);
+	return data;
+};
 
 export const getStudentsByCourse = async (bigCourseId: number): Promise<StudentsResponse> => {
 	const { data } = await axiosInstance.post<StudentsResponse>(

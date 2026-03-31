@@ -5,7 +5,7 @@ import { AnnouncementModal } from "@/components/admin/Attendance/AnnouncementMod
 import { AttendanceFilters } from "@/components/admin/Attendance/AttendanceFilters";
 import { AttendanceStats } from "@/components/admin/Attendance/AttendanceStats";
 import { AttendanceTable } from "@/components/admin/Attendance/AttendanceTable";
-import { LiveAnalytics } from "@/components/admin/Attendance/LiveAnalytics";
+import { LiveStatus } from "@/components/admin/Attendance/LiveStatus";
 import { SessionDetailHeader } from "@/components/admin/Attendance/SessionDetailHeader";
 import { SessionFilters } from "@/components/admin/Attendance/SessionFilters";
 import { SessionList } from "@/components/admin/Attendance/SessionList";
@@ -26,7 +26,16 @@ import {
 import type { CreateAnnouncementPayload } from "@/types/announcement";
 
 export default function AttendancePage() {
-	const [viewType, setViewType] = useState<"attendance" | "live">("attendance");
+	const [viewType, setViewType] = useState<"attendance" | "status">(() => {
+		const saved = sessionStorage.getItem("attendance-view-type");
+		return saved === "status" ? "status" : "attendance";
+	});
+
+	const handleViewTypeChange = (val: string) => {
+		const v = val as "attendance" | "status";
+		setViewType(v);
+		sessionStorage.setItem("attendance-view-type", v);
+	};
 
 	// Selection State
 	const [selectedGrade, setSelectedGrade] = useState<string | null>(null);
@@ -124,28 +133,25 @@ export default function AttendancePage() {
 								? "Session Details"
 								: viewType === "attendance"
 									? "Attendance Analytics"
-									: "Live Session Analytics"}
+									: "Live Session Monitoring"}
 						</h1>
 						<p className="text-gray-500 dark:text-neutral-400 mt-1">
 							{selectedSessionId
 								? `${selectedSession?.detail}`
 								: viewType === "attendance"
 									? "Monitor and manage student attendance records."
-									: "Real-time engagement and presence in live sessions."}
+									: "Drill-down to monitor specific ongoing course sessions."}
 						</p>
 					</div>
 				</div>
 				{!selectedSessionId && (
-					<Select
-						value={viewType}
-						onValueChange={(val) => setViewType(val as "attendance" | "live")}
-					>
+					<Select value={viewType} onValueChange={handleViewTypeChange}>
 						<SelectTrigger className="w-full md:w-45 bg-white dark:bg-neutral-800">
 							<SelectValue placeholder="Select View" />
 						</SelectTrigger>
-						<SelectContent className="bg-white dark:bg-neutral-800">
-							<SelectItem value="attendance">Attendance</SelectItem>
-							<SelectItem value="live">Live</SelectItem>
+						<SelectContent className="bg-white dark:bg-neutral-800 border-neutral-100 dark:border-neutral-700">
+							<SelectItem value="attendance">Class Records</SelectItem>
+							<SelectItem value="status">Live Status (Drill-down)</SelectItem>
 						</SelectContent>
 					</Select>
 				)}
@@ -251,7 +257,7 @@ export default function AttendancePage() {
 						)}
 					</motion.div>
 				) : (
-					<LiveAnalytics />
+					<LiveStatus />
 				)}
 			</AnimatePresence>
 

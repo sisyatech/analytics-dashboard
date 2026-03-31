@@ -63,6 +63,7 @@ export const API_ENDPOINTS = {
 	DASHBOARD_RATINGS_DISTRIBUTION: "/rkadmin/dashboard/ratings/distribution",
 	DASHBOARD_ACTIVITY_RECENT: "/rkadmin/dashboard/activity/recent",
 	GET_ALL_ANNOUNCEMENTS: "/rkadmin/get_all_announcements",
+	GET_ONGOING_SESSION: "/rkadmin/get_ongoing_session",
 } as const;
 
 export const GRADES = Array.from({ length: 12 }, (_, i) => (i + 1).toString());

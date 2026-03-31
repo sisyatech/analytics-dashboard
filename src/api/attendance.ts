@@ -6,6 +6,19 @@ import type {
 	PaginatedSessionsResponse,
 	SessionAttendanceResponse,
 } from "@/types/analytics";
+import type {
+	LiveSessionStudentsResponse,
+	OngoingSessionsByCourseResponse,
+} from "@/types/performance";
+
+export const getLiveSessionStudents = async (
+	sessionId: number,
+): Promise<LiveSessionStudentsResponse> => {
+	const response = await axiosInstance.get<LiveSessionStudentsResponse>(
+		`/teacher/live-session-students/${sessionId}`,
+	);
+	return response.data;
+};
 
 export const getCoursesByGrade = async (grade: string): Promise<CoursesResponse> => {
 	const response = await axiosInstance.post<CoursesResponse>(API_ENDPOINTS.GET_COURSES_BY_GRADE, {
@@ -49,6 +62,16 @@ export const markAsSisyaEmp = async (userId: number): Promise<MarkAsSisyaEmpResp
 	const response = await axiosInstance.post<MarkAsSisyaEmpResponse>(
 		API_ENDPOINTS.MARK_AS_SISYA_EMP,
 		{ userId },
+	);
+	return response.data;
+};
+
+export const getOngoingSessionsByCourse = async (
+	courseId: number,
+): Promise<OngoingSessionsByCourseResponse> => {
+	const response = await axiosInstance.post<OngoingSessionsByCourseResponse>(
+		API_ENDPOINTS.GET_ONGOING_SESSION,
+		{ courseId },
 	);
 	return response.data;
 };

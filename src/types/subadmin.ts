@@ -5,6 +5,7 @@ export interface SubAdmin {
 	role: "subadmin";
 	permissions: Record<string, boolean>;
 	analyticsPermissions: Record<string, boolean>;
+	gradePermissions: number[];
 	isActive: boolean;
 	createdAt: string;
 	updatedAt: string;
@@ -21,6 +22,7 @@ export interface UpdateSubAdminPayload {
 	email?: string;
 	permissions?: Record<string, boolean>;
 	analyticsPermissions?: Record<string, boolean>;
+	gradePermissions?: number[];
 }
 
 export interface UpdateSubAdminResponse {

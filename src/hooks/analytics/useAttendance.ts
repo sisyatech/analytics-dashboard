@@ -2,9 +2,23 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
 	getCompletedSessions,
 	getCoursesByGrade,
+	getLiveSessionStudents,
 	getSessionAttendance,
 	markAsSisyaEmp,
 } from "@/api/attendance";
+import { getCoursePerformanceSessions } from "@/api/performance";
+
+export const useLiveSessionStudents = (sessionId: number | null) => {
+	return useQuery({
+		queryKey: ["live-session-students", sessionId],
+		queryFn: ({ queryKey }) => {
+			const [, id] = queryKey as ["live-session-students", number];
+			return getLiveSessionStudents(id);
+		},
+		enabled: sessionId !== null,
+		refetchInterval: 30000,
+	});
+};
 
 export const useCoursesByGrade = (grade: string | null) => {
 	return useQuery({
@@ -40,6 +54,18 @@ export const useSessionsByCourse = (
 		},
 		enabled: courseId !== null,
 		staleTime: 1000 * 60 * 5, // 5 minutes
+	});
+};
+
+export const useCoursePerformanceSessions = (courseId: number | null) => {
+	return useQuery({
+		queryKey: ["course-performance-sessions", courseId],
+		queryFn: ({ queryKey }) => {
+			const [, id] = queryKey as ["course-performance-sessions", number];
+			return getCoursePerformanceSessions(id);
+		},
+		enabled: courseId !== null,
+		staleTime: 1000 * 30, // 30 seconds for live data
 	});
 };
 

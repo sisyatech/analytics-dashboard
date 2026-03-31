@@ -21,6 +21,27 @@ export interface MentorsResponse {
 	mentors: Mentor[];
 }
 
+export interface LiveSessionStudentInterval {
+	joinTime: number;
+	leaveTime: number | null;
+}
+
+export interface LiveSessionStudent {
+	userID: string;
+	userName: string;
+	intervals: LiveSessionStudentInterval[];
+	intervalCount: number;
+}
+
+export interface LiveSessionStudentsResponse {
+	success: boolean;
+	sessionId: number;
+	lastSyncAt: number | null;
+	students: LiveSessionStudent[];
+	studentCount: number;
+	message?: string;
+}
+
 export interface StudentsResponse {
 	success: boolean;
 	students: Student[];
@@ -534,4 +555,29 @@ export interface CourseTest {
 export interface CourseTestsResponse {
 	success: boolean;
 	testDetails: CourseTest[];
+}
+
+export interface OngoingSessionByCourse {
+	id: number;
+	detail: string;
+	startTime: string;
+	endTime: string;
+	isGoingOn: boolean;
+	vmIp: string | null;
+	roomId: string | null;
+	tokenId: string | null;
+	mentor: {
+		id: number;
+		name: string;
+		email: string;
+	};
+	subject: {
+		id: number;
+		name: string;
+	};
+}
+
+export interface OngoingSessionsByCourseResponse {
+	success: boolean;
+	sessions: OngoingSessionByCourse[];
 }

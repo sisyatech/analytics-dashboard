@@ -488,6 +488,11 @@ const LiveSessionMonitoring = ({
 																				{student.intervalCount} Sessions
 																			</span>
 																		)}
+																		{student.homeworkDone && (
+																			<span className="text-[10px] font-bold text-blue-500 bg-blue-50 dark:bg-blue-900/20 px-1.5 py-0.5 rounded flex items-center gap-1">
+																				<IconBook className="w-3 h-3" /> HW
+																			</span>
+																		)}
 																	</div>
 																</div>
 															</div>
@@ -772,6 +777,11 @@ const PiPView = ({
 														{student.intervalCount > 1 && (
 															<span className="text-[9px] text-neutral-400 font-medium">
 																{student.intervalCount} Sessions
+															</span>
+														)}
+														{student.homeworkDone && (
+															<span className="text-[9px] font-bold text-blue-500 flex items-center gap-1">
+																<IconBook className="w-2.5 h-2.5" /> HW Done
 															</span>
 														)}
 													</div>

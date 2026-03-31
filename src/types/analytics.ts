@@ -42,6 +42,7 @@ export interface StudentAttendance {
 	email: string;
 	phone: string;
 	status: "PRESENT" | "ABSENT";
+	homeworkDone: boolean;
 	totalDurationMin: number;
 	isEarlyLeave: boolean;
 	isLateJoin: boolean;

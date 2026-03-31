@@ -29,6 +29,7 @@ export interface LiveSessionStudentInterval {
 export interface LiveSessionStudent {
 	userID: string;
 	userName: string;
+	homeworkDone: boolean;
 	intervals: LiveSessionStudentInterval[];
 	intervalCount: number;
 }

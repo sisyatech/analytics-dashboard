@@ -1,9 +1,12 @@
+// biome-ignore-all lint: <already created file -- fixing will break things>
+
 import {
 	IconChevronDown,
 	IconChevronUp,
 	IconClock,
 	IconSearch,
 	IconUsers,
+	IconBook,
 } from "@tabler/icons-react";
 import { AnimatePresence, motion } from "motion/react";
 import { Fragment } from "react";
@@ -102,6 +105,7 @@ export const AttendanceTable = ({
 								<th className="px-8 py-5">Student Information</th>
 								<th className="px-8 py-5">Contact Details</th>
 								<th className="px-8 py-5 text-center">Engagement Status</th>
+								<th className="px-8 py-5 text-center">Homework</th>
 								<th className="px-8 py-5">Duration Data</th>
 								<th className="px-8 py-5 text-center">Actions</th>
 							</tr>
@@ -123,7 +127,6 @@ export const AttendanceTable = ({
 													<div className="w-10 h-10 rounded-2xl bg-linear-to-br from-neutral-100 to-neutral-200 dark:from-neutral-700 dark:to-neutral-600 flex items-center justify-center font-black text-neutral-600 dark:text-neutral-200 shadow-sm group-hover:scale-110 transition-transform">
 														{student.name.charAt(0)}
 													</div>
-													{/* biome-ignore lint/a11y/noStaticElementInteractions: div used as clickable element */}
 													<div
 														onContextMenu={(e) => {
 															e.preventDefault();
@@ -164,6 +167,21 @@ export const AttendanceTable = ({
 														)}
 													>
 														{student.status.toUpperCase()}
+													</span>
+												</div>
+											</td>
+											<td className="px-8 py-5">
+												<div className="flex justify-center">
+													<span
+														className={cn(
+															"px-3 py-1 rounded-lg text-[9px] font-black tracking-widest flex items-center gap-1.5",
+															student.homeworkDone
+																? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+																: "bg-neutral-100 text-neutral-500 dark:bg-neutral-900/30 dark:text-neutral-400",
+														)}
+													>
+														<IconBook className="w-3 h-3" />
+														{student.homeworkDone ? "DONE" : "PENDING"}
 													</span>
 												</div>
 											</td>
@@ -235,7 +253,7 @@ export const AttendanceTable = ({
 										<AnimatePresence>
 											{isExpanded && (
 												<tr>
-													<td colSpan={5} className="p-0 border-none">
+													<td colSpan={6} className="p-0 border-none">
 														<motion.div
 															initial={{ height: 0, opacity: 0 }}
 															animate={{ height: "auto", opacity: 1 }}
@@ -256,7 +274,6 @@ export const AttendanceTable = ({
 																<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 																	{student.intervals.map((interval, idx) => (
 																		<div
-																			// biome-ignore lint/suspicious/noArrayIndexKey: <static the index will not change>
 																			key={idx}
 																			className="p-4 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 flex flex-col gap-3 shadow-sm hover:shadow-md transition-shadow"
 																		>

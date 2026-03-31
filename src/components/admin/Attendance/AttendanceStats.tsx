@@ -1,4 +1,4 @@
-import { IconPercentage, IconUserCheck, IconUsers, IconUserX } from "@tabler/icons-react";
+import { IconBook, IconPercentage, IconUserCheck, IconUsers, IconUserX } from "@tabler/icons-react";
 import { motion } from "motion/react";
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
@@ -41,11 +41,18 @@ export const AttendanceStats = ({ attendanceData }: AttendanceStatsProps) => {
 				color: "text-amber-600 dark:text-amber-400",
 				bg: "bg-amber-50 dark:bg-amber-900/20",
 			},
+			{
+				label: "Homework Done",
+				value: `${attendanceData.students.filter((s) => s.homeworkDone).length}`,
+				icon: <IconBook className="w-5 h-5" />,
+				color: "text-blue-600 dark:text-blue-400",
+				bg: "bg-blue-50 dark:bg-blue-900/20",
+			},
 		];
 	}, [attendanceData]);
 
 	return (
-		<div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+		<div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
 			{stats.map((stat, i) => (
 				<motion.div
 					initial={{ opacity: 0, scale: 0.95 }}

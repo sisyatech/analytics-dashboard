@@ -1,0 +1,10 @@
+{
+	"compilerOptions": {
+		"target": "ESNext",
+		"module": "ESNext",
+		"lib": ["ESNext"],
+		"strict": true,
+		"types": ["assemblyscript/std/assembly"]
+	},
+	"include": ["./**/*.ts"]
+}

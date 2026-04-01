@@ -1,3 +1,5 @@
+// biome-ignore-all lint/suspicious/noExplicitAny: used
+
 import {
 	IconArrowLeft,
 	IconBook,
@@ -14,7 +16,7 @@ import {
 	IconX,
 } from "@tabler/icons-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { LiveChat } from "@/components/admin/Attendance/LiveChat";
 import { PiPWindow } from "@/components/shared/PiPWindow";
 import {
@@ -26,13 +28,162 @@ import {
 } from "@/components/ui/select";
 import { GRADES } from "@/constants";
 import { useCoursesByGrade, useLiveSessionStudents } from "@/hooks/analytics/useAttendance";
+import { useAttendanceWasm } from "@/hooks/analytics/useAttendanceWasm";
 import { type ChatMessage, useLiveAttendance } from "@/hooks/analytics/useLiveAttendance";
 import { useOngoingSessionsByCourse } from "@/hooks/analytics/useOngoingSessions";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
-import type { LiveSessionStudentsResponse, OngoingSessionByCourse } from "@/types/performance";
+import type { LiveSessionStudent, OngoingSessionByCourse } from "@/types/performance";
 
 const STORAGE_KEY = "live-status-state";
+
+const SyncStudentItem = ({
+	student,
+	isExpanded,
+	onToggle,
+	isLeft = false,
+	lastLeft,
+}: {
+	student: LiveSessionStudent & { lastLeft?: number };
+	isExpanded: boolean;
+	onToggle: () => void;
+	isLeft?: boolean;
+	lastLeft?: number;
+}) => {
+	const lastLeftDate = lastLeft ? new Date(lastLeft) : null;
+
+	return (
+		<>
+			<button
+				type="button"
+				onClick={onToggle}
+				className="w-full flex items-center justify-between p-4 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
+			>
+				<div className="flex items-center gap-4">
+					<div
+						className={cn(
+							"w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold border",
+							isLeft
+								? "bg-rose-50 dark:bg-rose-900/20 text-rose-500 border-rose-100/50 dark:border-rose-800/30"
+								: "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500 border-emerald-100/50 dark:border-emerald-800/30",
+						)}
+					>
+						{student.userName.charAt(0).toUpperCase()}
+					</div>
+					<div className="flex flex-col text-left">
+						<span className="text-sm font-bold text-neutral-800 dark:text-neutral-200">
+							{student.userName}
+						</span>
+						<div className="flex items-center gap-2 mt-0.5">
+							<span
+								className={cn(
+									"text-[10px] font-semibold uppercase tracking-wider flex items-center gap-1",
+									isLeft ? "text-rose-500" : "text-emerald-500",
+								)}
+							>
+								<div
+									className={cn(
+										"w-1.5 h-1.5 rounded-full",
+										isLeft ? "bg-rose-500" : "bg-emerald-500",
+									)}
+								/>{" "}
+								{isLeft ? "Disconnected" : "Synced"}
+							</span>
+							{isLeft && lastLeftDate && (
+								<span className="text-[10px] text-neutral-400 font-medium flex items-center gap-1">
+									<IconClock className="w-2.5 h-2.5" />
+									Left:{" "}
+									{lastLeftDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+								</span>
+							)}
+							{!isLeft && student.intervalCount > 1 && (
+								<span className="text-[10px] text-neutral-400 font-medium bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded">
+									{student.intervalCount} Sessions
+								</span>
+							)}
+							{student.homeworkDone && (
+								<span className="text-[10px] font-bold text-blue-500 bg-blue-50 dark:bg-blue-900/20 px-1.5 py-0.5 rounded flex items-center gap-1">
+									<IconBook className="w-3 h-3" /> HW
+								</span>
+							)}
+						</div>
+					</div>
+				</div>
+				<IconChevronDown
+					className={cn(
+						"w-5 h-5 text-neutral-400 transition-transform duration-300",
+						isExpanded && "rotate-180",
+					)}
+				/>
+			</button>
+
+			<AnimatePresence>
+				{isExpanded && (
+					<motion.div
+						initial={{ height: 0, opacity: 0 }}
+						animate={{ height: "auto", opacity: 1 }}
+						exit={{ height: 0, opacity: 0 }}
+						className="overflow-hidden border-t border-neutral-100 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50"
+					>
+						<div className="p-4 space-y-3">
+							<span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 px-1">
+								Connection History
+							</span>
+							<div className="space-y-2">
+								{[...student.intervals].reverse().map((interval, idx) => {
+									const joinDate = new Date(interval.joinTime);
+									const leaveDate = interval.leaveTime ? new Date(interval.leaveTime) : null;
+
+									return (
+										<div
+											key={`${student.userID}-${idx}`}
+											className="flex items-center justify-between bg-white dark:bg-neutral-800 p-3 rounded-xl border border-neutral-100 dark:border-neutral-700 shadow-sm"
+										>
+											<div className="flex items-center gap-3">
+												<div className="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-700 flex items-center justify-center">
+													<IconClock className="w-4 h-4 text-neutral-500" />
+												</div>
+												<div className="flex flex-col">
+													<span className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+														Session {student.intervals.length - idx}
+													</span>
+													<div className="flex items-center gap-1.5 text-[10px] text-neutral-500 font-medium">
+														<span className="text-emerald-600 dark:text-emerald-400">
+															{joinDate.toLocaleTimeString([], {
+																hour: "2-digit",
+																minute: "2-digit",
+															})}
+														</span>
+														<span>→</span>
+														{leaveDate ? (
+															<span className="text-rose-500 dark:text-rose-400">
+																{leaveDate.toLocaleTimeString([], {
+																	hour: "2-digit",
+																	minute: "2-digit",
+																})}
+															</span>
+														) : (
+															<span className="text-emerald-500 italic">Active</span>
+														)}
+													</div>
+												</div>
+											</div>
+											{leaveDate && (
+												<span className="text-[10px] font-bold bg-neutral-100 dark:bg-neutral-700 text-neutral-500 px-2 py-1 rounded-md">
+													{Math.round((leaveDate.getTime() - interval.joinTime) / 60000)}m
+												</span>
+											)}
+										</div>
+									);
+								})}
+							</div>
+						</div>
+					</motion.div>
+				)}
+			</AnimatePresence>
+		</>
+	);
+};
 
 const loadPersistedState = () => {
 	try {
@@ -250,9 +401,19 @@ const LiveSessionMonitoring = ({
 		session.vmIp || undefined,
 	);
 	const { data: polledData, refetch, isRefetching } = useLiveSessionStudents(session.id);
+	const { processStudents } = useAttendanceWasm();
 	const [isSheetOpen, setIsSheetOpen] = useState(false);
+	const [syncTab, setSyncTab] = useState<"joined" | "left">("joined");
 	const [expandedStudentId, setExpandedStudentId] = useState<string | null>(null);
 	const [isPipOpen, setIsPipOpen] = useState(false);
+
+	const { joinedStudents, leftStudents } = useMemo(() => {
+		const result = processStudents(polledData?.students);
+		return {
+			joinedStudents: result.joinedStudents,
+			leftStudents: [...result.leftStudents].sort((a, b) => b.lastLeft - a.lastLeft),
+		};
+	}, [polledData?.students, processStudents]);
 
 	const toggleStudent = (id: string) => {
 		setExpandedStudentId((prev) => (prev === id ? null : id));
@@ -315,7 +476,8 @@ const LiveSessionMonitoring = ({
 					messages={messages}
 					sendMessage={sendMessage}
 					isConnected={isConnected}
-					polledData={polledData}
+					joinedStudents={joinedStudents}
+					leftStudents={leftStudents}
 					refetch={refetch}
 					isRefetching={isRefetching}
 					sessionDetail={session.detail}
@@ -437,149 +599,140 @@ const LiveSessionMonitoring = ({
 									</div>
 								</div>
 
-								<div className="flex-1 overflow-y-auto p-4 bg-neutral-50/30 dark:bg-neutral-900/30">
-									<div className="mb-4 flex items-center justify-between px-2">
-										<span className="text-xs font-bold uppercase tracking-wider text-neutral-400">
-											Total Synced Students
-										</span>
-										<span className="text-xs font-bold bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 px-2.5 py-1 rounded-md">
-											{polledData?.studentCount || 0}
-										</span>
+								<div className="flex-1 overflow-y-auto bg-neutral-50/30 dark:bg-neutral-900/30 flex flex-col">
+									{/* Tab Switcher */}
+									<div className="px-4 pt-4 shrink-0">
+										<div className="flex p-1 bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 shadow-sm relative overflow-hidden">
+											<button
+												type="button"
+												onClick={() => setSyncTab("joined")}
+												className={cn(
+													"flex-1 flex items-center justify-center gap-2 py-2 text-xs font-bold transition-all relative z-10",
+													syncTab === "joined"
+														? "text-blue-600 dark:text-blue-400"
+														: "text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300",
+												)}
+											>
+												<IconUsers className="w-4 h-4" />
+												Joined
+												<span
+													className={cn(
+														"px-1.5 py-0.5 rounded-md text-[10px]",
+														syncTab === "joined"
+															? "bg-blue-100 dark:bg-blue-900/40"
+															: "bg-neutral-100 dark:bg-neutral-900",
+													)}
+												>
+													{joinedStudents.length}
+												</span>
+											</button>
+											<button
+												type="button"
+												onClick={() => setSyncTab("left")}
+												className={cn(
+													"flex-1 flex items-center justify-center gap-2 py-2 text-xs font-bold transition-all relative z-10",
+													syncTab === "left"
+														? "text-rose-500 dark:text-rose-400"
+														: "text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300",
+												)}
+											>
+												<IconClock className="w-4 h-4" />
+												Left
+												<span
+													className={cn(
+														"px-1.5 py-0.5 rounded-md text-[10px]",
+														syncTab === "left"
+															? "bg-rose-100 dark:bg-rose-900/40"
+															: "bg-neutral-100 dark:bg-neutral-900",
+													)}
+												>
+													{leftStudents.length}
+												</span>
+											</button>
+											<motion.div
+												layoutId="syncTabIndicator"
+												className={cn(
+													"absolute inset-y-1 rounded-lg bg-neutral-50 dark:bg-neutral-900/50 border border-neutral-100 dark:border-neutral-700 shadow-sm",
+													syncTab === "joined" ? "left-1" : "left-1/2",
+												)}
+												style={{ width: "calc(50% - 4px)" }}
+												transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+											/>
+										</div>
 									</div>
 
-									{!polledData?.students || polledData.students.length === 0 ? (
-										<div className="py-20 flex flex-col items-center justify-center text-center gap-4 border border-dashed border-neutral-200 dark:border-neutral-800 rounded-2xl mx-2 bg-white dark:bg-neutral-900/50">
-											<div className="w-16 h-16 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
-												<IconUsers className="w-8 h-8 text-neutral-400" />
-											</div>
-											<p className="text-sm font-medium text-neutral-500">
-												Waiting for attendance data...
-											</p>
-										</div>
-									) : (
-										<div className="space-y-3">
-											{polledData.students.map((student) => {
-												const isExpanded = expandedStudentId === student.userID;
-												return (
-													<div
-														key={student.userID}
-														className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden transition-all"
-													>
-														<button
-															type="button"
-															onClick={() => toggleStudent(student.userID)}
-															className="w-full flex items-center justify-between p-4 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
-														>
-															<div className="flex items-center gap-4">
-																<div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500 flex items-center justify-center text-sm font-bold border border-emerald-100/50 dark:border-emerald-800/30">
-																	{student.userName.charAt(0).toUpperCase()}
-																</div>
-																<div className="flex flex-col text-left">
-																	<span className="text-sm font-bold text-neutral-800 dark:text-neutral-200">
-																		{student.userName}
-																	</span>
-																	<div className="flex items-center gap-2 mt-0.5">
-																		<span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-500 flex items-center gap-1">
-																			<div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />{" "}
-																			Synced
-																		</span>
-																		{student.intervalCount > 1 && (
-																			<span className="text-[10px] text-neutral-400 font-medium bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded">
-																				{student.intervalCount} Sessions
-																			</span>
-																		)}
-																		{student.homeworkDone && (
-																			<span className="text-[10px] font-bold text-blue-500 bg-blue-50 dark:bg-blue-900/20 px-1.5 py-0.5 rounded flex items-center gap-1">
-																				<IconBook className="w-3 h-3" /> HW
-																			</span>
-																		)}
-																	</div>
-																</div>
-															</div>
-															<IconChevronDown
-																className={cn(
-																	"w-5 h-5 text-neutral-400 transition-transform duration-300",
-																	isExpanded && "rotate-180",
-																)}
-															/>
-														</button>
-
-														<AnimatePresence>
-															{isExpanded && (
-																<motion.div
-																	initial={{ height: 0, opacity: 0 }}
-																	animate={{ height: "auto", opacity: 1 }}
-																	exit={{ height: 0, opacity: 0 }}
-																	className="overflow-hidden border-t border-neutral-100 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50"
-																>
-																	<div className="p-4 space-y-3">
-																		<span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 px-1">
-																			Connection History
-																		</span>
-																		<div className="space-y-2">
-																			{student.intervals.map((interval, idx) => {
-																				const joinDate = new Date(interval.joinTime);
-																				const leaveDate = interval.leaveTime
-																					? new Date(interval.leaveTime)
-																					: null;
-
-																				return (
-																					<div
-																						key={`${student.userID}-${idx}`}
-																						className="flex items-center justify-between bg-white dark:bg-neutral-800 p-3 rounded-xl border border-neutral-100 dark:border-neutral-700 shadow-sm"
-																					>
-																						<div className="flex items-center gap-3">
-																							<div className="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-700 flex items-center justify-center">
-																								<IconClock className="w-4 h-4 text-neutral-500" />
-																							</div>
-																							<div className="flex flex-col">
-																								<span className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
-																									Session {student.intervals.length - idx}
-																								</span>
-																								<div className="flex items-center gap-1.5 text-[10px] text-neutral-500 font-medium">
-																									<span className="text-emerald-600 dark:text-emerald-400">
-																										{joinDate.toLocaleTimeString([], {
-																											hour: "2-digit",
-																											minute: "2-digit",
-																										})}
-																									</span>
-																									<span>→</span>
-																									{leaveDate ? (
-																										<span className="text-rose-500 dark:text-rose-400">
-																											{leaveDate.toLocaleTimeString([], {
-																												hour: "2-digit",
-																												minute: "2-digit",
-																											})}
-																										</span>
-																									) : (
-																										<span className="text-emerald-500 italic">
-																											Active
-																										</span>
-																									)}
-																								</div>
-																							</div>
-																						</div>
-																						{leaveDate && (
-																							<span className="text-[10px] font-bold bg-neutral-100 dark:bg-neutral-700 text-neutral-500 px-2 py-1 rounded-md">
-																								{Math.round(
-																									(leaveDate.getTime() - interval.joinTime) / 60000,
-																								)}
-																								m
-																							</span>
-																						)}
-																					</div>
-																				);
-																			})}
-																		</div>
-																	</div>
-																</motion.div>
-															)}
-														</AnimatePresence>
+									<div className="flex-1 overflow-y-auto p-4">
+										{syncTab === "joined" ? (
+											joinedStudents.length === 0 ? (
+												<div className="py-20 flex flex-col items-center justify-center text-center gap-4 border border-dashed border-neutral-200 dark:border-neutral-800 rounded-2xl mx-2 bg-white dark:bg-neutral-900/50">
+													<div className="w-16 h-16 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
+														<IconUsers className="w-8 h-8 text-neutral-400" />
 													</div>
-												);
-											})}
-										</div>
-									)}
+													<div className="space-y-1">
+														<p className="text-sm font-bold text-neutral-800 dark:text-neutral-200">
+															No Synced Students
+														</p>
+														<p className="text-xs text-neutral-500 px-8">
+															Waiting for active participation data from the server.
+														</p>
+													</div>
+												</div>
+											) : (
+												<div className="space-y-3">
+													{joinedStudents.map((student) => {
+														const isExpanded = expandedStudentId === student.userID;
+														return (
+															<div
+																key={student.userID}
+																className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden transition-all"
+															>
+																<SyncStudentItem
+																	student={student}
+																	isExpanded={isExpanded}
+																	onToggle={() => toggleStudent(student.userID)}
+																/>
+															</div>
+														);
+													})}
+												</div>
+											)
+										) : leftStudents.length === 0 ? (
+											<div className="py-20 flex flex-col items-center justify-center text-center gap-4 border border-dashed border-neutral-200 dark:border-neutral-800 rounded-2xl mx-2 bg-white dark:bg-neutral-900/50">
+												<div className="w-16 h-16 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
+													<IconClock className="w-8 h-8 text-neutral-400" />
+												</div>
+												<div className="space-y-1">
+													<p className="text-sm font-bold text-neutral-800 dark:text-neutral-200">
+														None have left yet
+													</p>
+													<p className="text-xs text-neutral-500 px-8">
+														Students who exit the session will appear here with their departure
+														time.
+													</p>
+												</div>
+											</div>
+										) : (
+											<div className="space-y-3">
+												{leftStudents.map((student) => {
+													const isExpanded = expandedStudentId === student.userID;
+													return (
+														<div
+															key={student.userID}
+															className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden transition-all grayscale opacity-80"
+														>
+															<SyncStudentItem
+																student={student}
+																isExpanded={isExpanded}
+																onToggle={() => toggleStudent(student.userID)}
+																isLeft
+																lastLeft={student.lastLeft}
+															/>
+														</div>
+													);
+												})}
+											</div>
+										)}
+									</div>
 								</div>
 							</motion.div>
 						</>
@@ -600,7 +753,8 @@ interface PiPViewProps {
 	messages: ChatMessage[];
 	sendMessage: (msg: string) => void;
 	isConnected: boolean;
-	polledData?: LiveSessionStudentsResponse | null;
+	joinedStudents: LiveSessionStudent[];
+	leftStudents: (LiveSessionStudent & { lastLeft: number })[];
 	refetch: () => void;
 	isRefetching: boolean;
 	sessionDetail: string;
@@ -611,12 +765,14 @@ const PiPView = ({
 	messages,
 	sendMessage,
 	isConnected,
-	polledData,
+	joinedStudents,
+	leftStudents,
 	refetch,
 	isRefetching,
 	sessionDetail,
 }: PiPViewProps) => {
 	const [activeTab, setActiveTab] = useState<"participants" | "chat" | "server">("participants");
+	const [syncTab, setSyncTab] = useState<"joined" | "left">("joined");
 	const [expandedStudentId, setExpandedStudentId] = useState<string | null>(null);
 
 	const toggleStudent = (id: string) => {
@@ -725,12 +881,48 @@ const PiPView = ({
 				)}
 
 				{activeTab === "server" && (
-					<div className="h-full overflow-y-auto p-4">
-						<div className="flex items-center justify-between mb-4">
-							<span className="text-xs font-bold uppercase tracking-wider text-neutral-400">
-								Total Synced
-							</span>
-							<div className="flex items-center gap-2">
+					<div className="h-full overflow-y-auto flex flex-col">
+						<div className="px-4 pt-4 shrink-0">
+							<div className="flex p-1 bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 shadow-sm relative overflow-hidden">
+								<button
+									type="button"
+									onClick={() => setSyncTab("joined")}
+									className={cn(
+										"flex-1 flex items-center justify-center gap-2 py-2 text-[10px] font-bold transition-all relative z-10",
+										syncTab === "joined"
+											? "text-blue-600 dark:text-blue-400"
+											: "text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300",
+									)}
+								>
+									Joined ({joinedStudents.length})
+								</button>
+								<button
+									type="button"
+									onClick={() => setSyncTab("left")}
+									className={cn(
+										"flex-1 flex items-center justify-center gap-2 py-2 text-[10px] font-bold transition-all relative z-10",
+										syncTab === "left"
+											? "text-rose-500 dark:text-rose-400"
+											: "text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300",
+									)}
+								>
+									Left ({leftStudents.length})
+								</button>
+								<motion.div
+									className={cn(
+										"absolute inset-y-1 rounded-lg bg-neutral-50 dark:bg-neutral-900/50 border border-neutral-100 dark:border-neutral-700 shadow-sm",
+										syncTab === "joined" ? "left-1" : "left-1/2",
+									)}
+									style={{ width: "calc(50% - 4px)" }}
+								/>
+							</div>
+						</div>
+
+						<div className="flex-1 overflow-y-auto p-4 space-y-2">
+							<div className="flex items-center justify-between mb-2">
+								<span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">
+									{syncTab === "joined" ? "Synced Students" : "Disconnected Students"}
+								</span>
 								<button
 									type="button"
 									onClick={() => refetch()}
@@ -738,109 +930,47 @@ const PiPView = ({
 									className="p-1 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-md"
 								>
 									<IconRefresh
-										className={cn("w-3.5 h-3.5 text-neutral-500", isRefetching && "animate-spin")}
+										className={cn("w-3 h-3 text-neutral-500", isRefetching && "animate-spin")}
 									/>
 								</button>
-								<span className="text-xs font-bold bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-md">
-									{polledData?.studentCount || 0}
-								</span>
 							</div>
-						</div>
 
-						{!polledData?.students || polledData.students.length === 0 ? (
-							<div className="py-12 flex flex-col items-center text-center opacity-50">
-								<IconUsers className="w-8 h-8 text-neutral-400 mb-2" />
-								<p className="text-sm font-medium">No server data</p>
-							</div>
-						) : (
-							<div className="space-y-2">
-								{polledData.students.map((student) => {
-									const isExpanded = expandedStudentId === student.userID;
-									return (
-										<div
-											key={student.userID}
-											className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden"
-										>
-											<button
-												type="button"
-												onClick={() => toggleStudent(student.userID)}
-												className="w-full flex items-center justify-between p-3 hover:bg-neutral-50 dark:hover:bg-neutral-800/50"
+							{(syncTab === "joined" ? joinedStudents : leftStudents).length === 0 ? (
+								<div className="py-12 flex flex-col items-center text-center opacity-50">
+									{syncTab === "joined" ? (
+										<IconUsers className="w-8 h-8 text-neutral-400 mb-2" />
+									) : (
+										<IconClock className="w-8 h-8 text-neutral-400 mb-2" />
+									)}
+									<p className="text-xs font-medium">
+										{syncTab === "joined" ? "No server data" : "No students left"}
+									</p>
+								</div>
+							) : (
+								<div className="space-y-2">
+									{(syncTab === "joined" ? joinedStudents : leftStudents).map((student) => {
+										const isExpanded = expandedStudentId === student.userID;
+										return (
+											<div
+												key={student.userID}
+												className={cn(
+													"bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden",
+													syncTab === "left" && "opacity-80 grayscale",
+												)}
 											>
-												<div className="flex items-center gap-3">
-													<div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500 flex items-center justify-center text-sm font-bold border border-emerald-100/50 dark:border-emerald-800/30">
-														{student.userName.charAt(0).toUpperCase()}
-													</div>
-													<div className="flex flex-col text-left">
-														<span className="text-sm font-bold dark:text-neutral-200">
-															{student.userName}
-														</span>
-														{student.intervalCount > 1 && (
-															<span className="text-[9px] text-neutral-400 font-medium">
-																{student.intervalCount} Sessions
-															</span>
-														)}
-														{student.homeworkDone && (
-															<span className="text-[9px] font-bold text-blue-500 flex items-center gap-1">
-																<IconBook className="w-2.5 h-2.5" /> HW Done
-															</span>
-														)}
-													</div>
-												</div>
-												<IconChevronDown
-													className={cn(
-														"w-4 h-4 text-neutral-400 transition-transform",
-														isExpanded && "rotate-180",
-													)}
+												<SyncStudentItem
+													student={student}
+													isExpanded={isExpanded}
+													onToggle={() => toggleStudent(student.userID)}
+													isLeft={syncTab === "left"}
+													lastLeft={(student as any).lastLeft}
 												/>
-											</button>
-
-											{isExpanded && (
-												<div className="border-t border-neutral-100 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50 p-3 space-y-2">
-													{student.intervals.map((interval, idx) => {
-														const joinDate = new Date(interval.joinTime);
-														const leaveDate = interval.leaveTime
-															? new Date(interval.leaveTime)
-															: null;
-														return (
-															<div
-																key={`${student.userID}-${idx}`}
-																className="flex items-center justify-between bg-white dark:bg-neutral-800 p-2.5 rounded-lg border border-neutral-100 dark:border-neutral-700"
-															>
-																<div className="flex flex-col">
-																	<span className="text-[10px] font-semibold text-neutral-500">
-																		Session {student.intervals.length - idx}
-																	</span>
-																	<div className="text-[10px] text-neutral-600 dark:text-neutral-400 font-medium flex items-center gap-1">
-																		{joinDate.toLocaleTimeString([], {
-																			hour: "2-digit",
-																			minute: "2-digit",
-																		})}
-																		<span>→</span>
-																		{leaveDate ? (
-																			leaveDate.toLocaleTimeString([], {
-																				hour: "2-digit",
-																				minute: "2-digit",
-																			})
-																		) : (
-																			<span className="text-emerald-500">Active</span>
-																		)}
-																	</div>
-																</div>
-																{leaveDate && (
-																	<span className="text-[9px] font-bold bg-neutral-100 dark:bg-neutral-700 text-neutral-500 px-1.5 py-0.5 rounded">
-																		{Math.round((leaveDate.getTime() - interval.joinTime) / 60000)}m
-																	</span>
-																)}
-															</div>
-														);
-													})}
-												</div>
-											)}
-										</div>
-									);
-								})}
-							</div>
-						)}
+											</div>
+										);
+									})}
+								</div>
+							)}
+						</div>
 					</div>
 				)}
 			</div>

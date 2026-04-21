@@ -156,7 +156,7 @@ export const SessionFilters = ({
 						onClick={onClear}
 						variant="ghost"
 						size="icon"
-						className="h-11 w-11 rounded-xl text-neutral-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all flex-shrink-0"
+						className="h-11 w-11 rounded-xl text-neutral-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all shrink-0"
 						title="Clear filters"
 					>
 						<IconX className="w-5 h-5" />

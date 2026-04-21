@@ -9,6 +9,7 @@ import {
 	getRatingsDistribution,
 	getRecentActivity,
 	getSessionTrends,
+	getVisitorStats,
 } from "@/api/dashboard";
 
 export const useDashboardOverview = () => {
@@ -80,5 +81,13 @@ export const useRecentActivity = () => {
 		queryKey: ["dashboardActivity"],
 		queryFn: getRecentActivity,
 		staleTime: 1000 * 60 * 1, // 1 minute stale time for activity
+	});
+};
+
+export const useVisitorStats = (days = 30) => {
+	return useQuery({
+		queryKey: ["visitorStats", days],
+		queryFn: () => getVisitorStats(days),
+		staleTime: 1000 * 60 * 5,
 	});
 };

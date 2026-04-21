@@ -2,18 +2,21 @@ import { format } from "date-fns";
 import {
 	AssessmentStats,
 	CoursePerformanceTable,
-	DashboardStatsCards,
 	DoubtAnalyticsChart,
 	EnrollmentTrendChart,
 	MentorLeaderboard,
 	QuickActions,
 	RecentActivity,
 	SessionTrendChart,
+	StatCard,
+	VisitorStatCard,
+	VisitorTrendChart,
 } from "@/components/admin/Dashboard";
-import { useDashboardOverview } from "@/hooks/admin/useDashboardStats";
+import { useDashboardOverview, useVisitorStats } from "@/hooks/admin/useDashboardStats";
 
 export default function AdminDashboard() {
 	const { data, isLoading, error } = useDashboardOverview();
+	const { data: visitorData, isLoading: isVisitorLoading } = useVisitorStats(30);
 
 	// Fallback stats structure
 	// Fallback stats structure with safe defaults
@@ -77,7 +80,16 @@ export default function AdminDashboard() {
 			</div>
 
 			{/* Row 1: Key Stats */}
-			<DashboardStatsCards stats={stats} />
+			<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
+				<VisitorStatCard
+					uniqueVisitors={visitorData?.data?.today?.uniqueVisitors ?? 0}
+					isLoading={isVisitorLoading}
+				/>
+				<StatCard title="Total Students" value={stats.totalStudents} icon="students" delay={0.1} />
+				<StatCard title="Total Courses" value={stats.totalCourses} icon="courses" delay={0.2} />
+				<StatCard title="Total Sessions" value={stats.totalSessions} icon="sessions" delay={0.3} />
+				<StatCard title="Doubts Resolved" value={stats.doubts.solved} icon="mentors" delay={0.4} />
+			</div>
 
 			{/* Row 2: Quick Actions */}
 			<div className="grid gap-6">
@@ -92,8 +104,9 @@ export default function AdminDashboard() {
 				</div>
 
 				{/* Main Chart Column - 3/4 width */}
-				<div className="lg:col-span-3">
+				<div className="lg:col-span-3 space-y-6">
 					<EnrollmentTrendChart />
+					<VisitorTrendChart />
 				</div>
 			</div>
 

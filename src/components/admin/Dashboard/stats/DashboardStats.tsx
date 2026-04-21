@@ -24,7 +24,7 @@ const colorMap = {
 	courses: "bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400",
 };
 
-function StatCard({ title, value, icon, delay = 0 }: Omit<StatCardProps, "trend">) {
+export function StatCard({ title, value, icon, delay = 0 }: Omit<StatCardProps, "trend">) {
 	const Icon = iconMap[icon];
 
 	return (

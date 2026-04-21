@@ -146,3 +146,16 @@ export interface RecentActivityResponse {
 	success: boolean;
 	data: RecentActivityItem[];
 }
+export interface VisitorStatsItem {
+	date: string;
+	uniqueVisitors: number;
+	totalRequests: number;
+}
+
+export interface VisitorStatsResponse {
+	success: boolean;
+	data: {
+		today: VisitorStatsItem;
+		history: VisitorStatsItem[];
+	};
+}

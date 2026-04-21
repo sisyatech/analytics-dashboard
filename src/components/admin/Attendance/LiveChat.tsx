@@ -123,7 +123,7 @@ export const LiveChat = ({ messages, onSend, isConnected }: LiveChatProps) => {
 								</div>
 								<p
 									className={cn(
-										"text-[13px] leading-relaxed break-words",
+										"text-[13px] leading-relaxed wrap-break-word",
 										msg.isMe ? "text-white" : "text-neutral-800 dark:text-neutral-200",
 									)}
 								>

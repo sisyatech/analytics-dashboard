@@ -10,6 +10,7 @@ import type {
 	RatingsDistributionResponse,
 	RecentActivityResponse,
 	SessionTrendResponse,
+	VisitorStatsResponse,
 } from "@/types/dashboard";
 
 export const getDashboardOverview = async (): Promise<DashboardOverviewResponse> => {
@@ -72,5 +73,12 @@ export const getRecentActivity = async (): Promise<RecentActivityResponse> => {
 	const { data } = await axiosInstance.post<RecentActivityResponse>(
 		API_ENDPOINTS.DASHBOARD_ACTIVITY_RECENT,
 	);
+	return data;
+};
+
+export const getVisitorStats = async (days = 30): Promise<VisitorStatsResponse> => {
+	const { data } = await axiosInstance.post<VisitorStatsResponse>(API_ENDPOINTS.VISITOR_STATS, {
+		days,
+	});
 	return data;
 };

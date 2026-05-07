@@ -9,6 +9,7 @@ import HistoryAnnouncements from "@/pages/Announcements/history";
 import SentAnnouncemnet from "@/pages/Announcements/sent";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AttendancePage from "@/pages/admin/Attendance";
+import AttendanceEnginePage from "@/pages/admin/AttendanceEngine";
 import CourseReport from "@/pages/admin/CourseReport";
 import MentorReport from "@/pages/admin/MentorReport";
 import StudentReport from "@/pages/admin/StudentReport";
@@ -72,6 +73,17 @@ const AppRoutes = () => {
 						element={
 							<ProtectedRoute roles={["admin", "subadmin"]} permissionKey="course_report_access">
 								<CourseReport />
+							</ProtectedRoute>
+						}
+					/>
+					<Route
+						path={ROUTES.ATTENDANCE_ENGINE}
+						element={
+							<ProtectedRoute
+								roles={["admin", "subadmin"]}
+								permissionKey="attendance_engine_access"
+							>
+								<AttendanceEnginePage />
 							</ProtectedRoute>
 						}
 					/>

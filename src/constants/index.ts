@@ -16,6 +16,7 @@ export const ROUTES = {
 	SUBADMIN_MANAGEMENT: "/admin/subadmin-management",
 	ANNOUNCEMENTS_HISTORY: "/admin/announcements",
 	ANNOUNCEMENTS_SENT: "/admin/announcements/sent",
+	ATTENDANCE_ENGINE: "/admin/attendance-engine",
 } as const;
 
 export const API_BASE_URL = "https://sisyaclass.xyz";
@@ -65,6 +66,13 @@ export const API_ENDPOINTS = {
 	GET_ALL_ANNOUNCEMENTS: "/rkadmin/get_all_announcements",
 	GET_ONGOING_SESSION: "/rkadmin/get_ongoing_session",
 	VISITOR_STATS: "/rkadmin/visitor_stats",
+	// Attendance Engine
+	ATTENDANCE_ENGINE_REPORT: "/rkadmin/attendance/engine/report",
+	ATTENDANCE_ENGINE_REMARKS: "/rkadmin/attendance/engine/remarks",
+	STUDENT_ONBOARDING: "/rkadmin/student/engine/onboarding",
+	LOG_TOUCHPOINT: "/rkadmin/student/engine/log-touchpoint",
+	ATTENDANCE_ENGINE_SYNC: "/rkadmin/attendance/engine/sync",
+	GET_ENGAGEMENT_LOGS: "/rkadmin/student/engine/logs",
 } as const;
 
 export const GRADES = Array.from({ length: 12 }, (_, i) => (i + 1).toString());

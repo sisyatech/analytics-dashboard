@@ -23,6 +23,13 @@ export const sidebarConfig: SidebarNavItem[] = [
 		path: ROUTES.ATTENDANCE,
 	},
 	{
+		label: "Attendance Engine",
+		icon: Icons.IconDatabase,
+		roles: ["admin"],
+		permissionKey: "attendance_engine_access",
+		path: ROUTES.ATTENDANCE_ENGINE,
+	},
+	{
 		label: "Student Report",
 		icon: Icons.IconReportAnalytics,
 		roles: ["admin"],

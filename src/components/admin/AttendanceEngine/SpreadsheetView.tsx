@@ -1,5 +1,14 @@
-import { IconEdit, IconHistory, IconUserPlus, IconX } from "@tabler/icons-react";
-import React, { useEffect, useState } from "react";
+import {
+	IconClock,
+	IconEdit,
+	IconHistory,
+	IconTarget,
+	IconUserPlus,
+	IconX,
+} from "@tabler/icons-react";
+import { AnimatePresence, motion } from "motion/react";
+import { Fragment, useEffect, useMemo, useState } from "react";
+import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 import type { AttendanceEngineSheet, EngagementLog } from "@/api/attendanceEngine";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,6 +42,11 @@ export const SpreadsheetView = ({
 	const [isRemarksModalOpen, setIsRemarksModalOpen] = useState(false);
 	const [isLogModalOpen, setIsLogModalOpen] = useState(false);
 	const [isLogsViewModalOpen, setIsLogsViewModalOpen] = useState(false);
+	const [selectedSessionForInsights, setSelectedSessionForInsights] = useState<{
+		id: number;
+		date: string;
+	} | null>(null);
+	const [isInsightsSheetOpen, setIsInsightsSheetOpen] = useState(false);
 
 	const updateRemarks = useUpdateAttendanceRemarks();
 	const updateOnboarding = useUpdateStudentOnboarding();
@@ -86,7 +100,7 @@ export const SpreadsheetView = ({
 	}, [targetDate]);
 
 	// Sort sessions once for reuse in headers and body
-	const sortedSessions = React.useMemo(() => {
+	const sortedSessions = useMemo(() => {
 		const sessions = [...sheet.sessions];
 		if (sessionOrder === "newest") {
 			return sessions.reverse();
@@ -137,20 +151,29 @@ export const SpreadsheetView = ({
 							<th
 								key={`date-${session.id}`}
 								colSpan={4}
-								className="border-r border-b border-neutral-300 p-1 text-center bg-[#e2f3e7] text-neutral-800 font-bold ae-date-header"
+								className="border-r border-b border-neutral-300 p-0 text-center bg-[#e2f3e7] text-neutral-800 font-bold ae-date-header group/date"
 							>
-								{new Date(session.date).toLocaleDateString("en-GB", {
-									day: "2-digit",
-									month: "2-digit",
-									year: "2-digit",
-								})}
+								<button
+									type="button"
+									onClick={() => {
+										setSelectedSessionForInsights(session);
+										setIsInsightsSheetOpen(true);
+									}}
+									className="w-full h-full p-1 hover:bg-emerald-100 transition-colors flex items-center justify-center gap-1.5"
+								>
+									{new Date(session.date).toLocaleDateString("en-GB", {
+										day: "2-digit",
+										month: "2-digit",
+										year: "2-digit",
+									})}
+								</button>
 							</th>
 						))}
 					</tr>
 					{/* Row 2: Sub-headers */}
 					<tr className="border-b border-neutral-300 bg-[#f8f9fa] shadow-sm">
 						{sortedSessions.map((session) => (
-							<React.Fragment key={`sub-${session.id}`}>
+							<Fragment key={`sub-${session.id}`}>
 								<th className="border-r border-neutral-300 p-1 w-16 text-neutral-600 font-medium">
 									Att
 								</th>
@@ -163,7 +186,7 @@ export const SpreadsheetView = ({
 								<th className="border-r border-neutral-300 p-1 w-48 text-neutral-600 font-medium text-left px-2">
 									Remark
 								</th>
-							</React.Fragment>
+							</Fragment>
 						))}
 					</tr>
 				</thead>
@@ -257,16 +280,16 @@ export const SpreadsheetView = ({
 								const session = student.sessions.find((s) => s.sessionId === sessionHeader.id);
 								if (!session)
 									return (
-										<React.Fragment key={`empty-${sessionHeader.id}`}>
+										<Fragment key={`empty-${sessionHeader.id}`}>
 											<td className="border-r border-neutral-300 bg-neutral-50" />
 											<td className="border-r border-neutral-300 bg-neutral-50" />
 											<td className="border-r border-neutral-300 bg-neutral-50" />
 											<td className="border-r border-neutral-300 bg-neutral-50" />
-										</React.Fragment>
+										</Fragment>
 									);
 
 								return (
-									<React.Fragment key={session.sessionId}>
+									<Fragment key={session.sessionId}>
 										{/* Attendance */}
 										<td
 											className={cn(
@@ -305,7 +328,7 @@ export const SpreadsheetView = ({
 												</button>
 											</div>
 										</td>
-									</React.Fragment>
+									</Fragment>
 								);
 							})}
 						</tr>
@@ -355,6 +378,249 @@ export const SpreadsheetView = ({
 					onClose={() => setIsLogsViewModalOpen(false)}
 				/>
 			)}
+
+			<AnimatePresence>
+				{isInsightsSheetOpen && selectedSessionForInsights && (
+					<SessionInsightsSheet
+						session={selectedSessionForInsights}
+						sheet={sheet}
+						onClose={() => setIsInsightsSheetOpen(false)}
+					/>
+				)}
+			</AnimatePresence>
+		</div>
+	);
+};
+
+// --- Session Insights Sheet ---
+
+const SessionInsightsSheet = ({
+	session,
+	sheet,
+	onClose,
+}: {
+	session: { id: number; date: string };
+	sheet: AttendanceEngineSheet;
+	onClose: () => void;
+}) => {
+	const studentsForSession = sheet.students
+		.map((student) => student.sessions.find((s) => s.sessionId === session.id))
+		.filter(Boolean);
+
+	const presentCount = studentsForSession.filter((s) => s?.att === "P").length;
+	const absentCount = studentsForSession.filter((s) => s?.att === "A").length;
+	const hwDoneCount = studentsForSession.filter((s) => s?.hw?.toLowerCase() === "done").length;
+	const totalStudents = sheet.students.length;
+	const hwPendingCount = totalStudents - hwDoneCount;
+
+	const attendanceData = [
+		{ name: "Present", value: presentCount, color: "#10b981" },
+		{ name: "Absent", value: absentCount, color: "#f43f5e" },
+	];
+
+	const hwData = [
+		{ name: "Done", value: hwDoneCount, color: "#3b82f6" },
+		{ name: "Pending", value: hwPendingCount, color: "#f59e0b" },
+	];
+
+	const avgTime =
+		studentsForSession.length > 0
+			? studentsForSession.reduce((acc, s) => acc + (s?.time || 0), 0) / studentsForSession.length
+			: 0;
+
+	return (
+		<div className="fixed inset-0 z-100 flex justify-end">
+			<motion.button
+				initial={{ opacity: 0 }}
+				animate={{ opacity: 1 }}
+				exit={{ opacity: 0 }}
+				type="button"
+				className="absolute inset-0 w-full h-full cursor-default outline-none bg-black/30 backdrop-blur-[2px]"
+				onClick={onClose}
+				aria-label="Close sheet"
+			/>
+
+			<motion.div
+				initial={{ x: "100%" }}
+				animate={{ x: 0 }}
+				exit={{ x: "100%" }}
+				transition={{ type: "spring", damping: 25, stiffness: 200 }}
+				className="relative bg-white w-full max-w-[360px] h-full shadow-xl border-l border-neutral-200 flex flex-col"
+			>
+				{/* Header - More compact */}
+				<div className="px-5 py-4 border-b border-neutral-100 flex justify-between items-center bg-white">
+					<div className="flex items-center gap-2">
+						<div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600">
+							<IconTarget className="w-4 h-4" />
+						</div>
+						<div>
+							<h3 className="text-sm font-bold text-neutral-900 leading-none">Session Data</h3>
+							<p className="text-[10px] text-neutral-400 mt-1">
+								{new Date(session.date).toLocaleDateString("en-GB", {
+									weekday: "short",
+									day: "numeric",
+									month: "short",
+								})}
+							</p>
+						</div>
+					</div>
+					<button
+						type="button"
+						onClick={onClose}
+						className="p-1.5 hover:bg-neutral-100 rounded-md transition-colors"
+					>
+						<IconX className="w-4 h-4 text-neutral-400" />
+					</button>
+				</div>
+
+				{/* Content - Compact and subtle */}
+				<div className="flex-1 overflow-y-auto p-5 space-y-6 scrollbar-hide">
+					{/* Attendance Section */}
+					<div className="space-y-3">
+						<div className="flex items-center justify-between px-1">
+							<h4 className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
+								Attendance
+							</h4>
+							<span className="text-[10px] font-bold text-neutral-900 bg-neutral-50 px-2 py-0.5 rounded border border-neutral-100">
+								{totalStudents} Total
+							</span>
+						</div>
+
+						<div className="flex items-center gap-4 p-4 rounded-2xl bg-[#fafafa] border border-neutral-100">
+							<div className="w-24 h-24 shrink-0">
+								<ResponsiveContainer width="100%" height="100%">
+									<PieChart>
+										<Pie
+											data={attendanceData}
+											innerRadius={22}
+											outerRadius={38}
+											paddingAngle={4}
+											dataKey="value"
+										>
+											{attendanceData.map((entry) => (
+												<Cell key={entry.name} fill={entry.color} />
+											))}
+										</Pie>
+									</PieChart>
+								</ResponsiveContainer>
+							</div>
+							<div className="flex-1 space-y-2">
+								<div className="flex items-center justify-between">
+									<div className="flex items-center gap-2">
+										<div className="w-2 h-2 rounded-full bg-emerald-500" />
+										<span className="text-[11px] font-medium text-neutral-600">Present</span>
+									</div>
+									<div className="flex items-center gap-1.5">
+										<span className="text-[11px] font-bold text-neutral-900">{presentCount}</span>
+										<span className="text-[10px] font-medium text-neutral-400">
+											({((presentCount / totalStudents) * 100).toFixed(0)}%)
+										</span>
+									</div>
+								</div>
+								<div className="flex items-center justify-between">
+									<div className="flex items-center gap-2">
+										<div className="w-2 h-2 rounded-full bg-rose-500" />
+										<span className="text-[11px] font-medium text-neutral-600">Absent</span>
+									</div>
+									<div className="flex items-center gap-1.5">
+										<span className="text-[11px] font-bold text-neutral-900">{absentCount}</span>
+										<span className="text-[10px] font-medium text-neutral-400">
+											({((absentCount / totalStudents) * 100).toFixed(0)}%)
+										</span>
+									</div>
+								</div>
+								<div className="h-1.5 w-full bg-neutral-100 rounded-full overflow-hidden mt-1">
+									<div
+										className="h-full bg-emerald-500 rounded-full"
+										style={{ width: `${(presentCount / totalStudents) * 100}%` }}
+									/>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					{/* Homework Section */}
+					<div className="space-y-3">
+						<h4 className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider px-1">
+							Homework Status
+						</h4>
+						<div className="flex items-center gap-4 p-4 rounded-2xl bg-[#fafafa] border border-neutral-100">
+							<div className="w-24 h-24 shrink-0">
+								<ResponsiveContainer width="100%" height="100%">
+									<PieChart>
+										<Pie
+											data={hwData}
+											innerRadius={22}
+											outerRadius={38}
+											paddingAngle={4}
+											dataKey="value"
+										>
+											{hwData.map((entry) => (
+												<Cell key={entry.name} fill={entry.color} />
+											))}
+										</Pie>
+									</PieChart>
+								</ResponsiveContainer>
+							</div>
+							<div className="flex-1 space-y-2">
+								<div className="flex items-center justify-between">
+									<div className="flex items-center gap-2">
+										<div className="w-2 h-2 rounded-full bg-blue-500" />
+										<span className="text-[11px] font-medium text-neutral-600">Done</span>
+									</div>
+									<div className="flex items-center gap-1.5">
+										<span className="text-[11px] font-bold text-neutral-900">{hwDoneCount}</span>
+										<span className="text-[10px] font-medium text-neutral-400">
+											({((hwDoneCount / totalStudents) * 100).toFixed(0)}%)
+										</span>
+									</div>
+								</div>
+								<div className="flex items-center justify-between">
+									<div className="flex items-center gap-2">
+										<div className="w-2 h-2 rounded-full bg-amber-500" />
+										<span className="text-[11px] font-medium text-neutral-600">Pending</span>
+									</div>
+									<div className="flex items-center gap-1.5">
+										<span className="text-[11px] font-bold text-neutral-900">{hwPendingCount}</span>
+										<span className="text-[10px] font-medium text-neutral-400">
+											({((hwPendingCount / totalStudents) * 100).toFixed(0)}%)
+										</span>
+									</div>
+								</div>
+								<div className="h-1.5 w-full bg-neutral-100 rounded-full overflow-hidden mt-1">
+									<div
+										className="h-full bg-blue-500 rounded-full"
+										style={{ width: `${(hwDoneCount / totalStudents) * 100}%` }}
+									/>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					{/* Time Info - More subtle */}
+					<div className="p-4 rounded-2xl bg-neutral-50 border border-neutral-100 flex items-center justify-between">
+						<div className="flex items-center gap-2 text-neutral-500">
+							<IconClock className="w-4 h-4" />
+							<span className="text-[10px] font-bold uppercase tracking-wider">Avg. Time</span>
+						</div>
+						<div className="flex items-baseline gap-1">
+							<span className="text-lg font-black text-neutral-900">{avgTime.toFixed(1)}</span>
+							<span className="text-[10px] font-bold text-neutral-400 uppercase">Min</span>
+						</div>
+					</div>
+				</div>
+
+				{/* Footer - Compact */}
+				<div className="p-4 bg-white border-t border-neutral-100">
+					<Button
+						onClick={onClose}
+						variant="outline"
+						className="w-full h-10 rounded-xl text-neutral-600 font-bold text-[12px] border-neutral-200 hover:bg-neutral-50 transition-all"
+					>
+						Close
+					</Button>
+				</div>
+			</motion.div>
 		</div>
 	);
 };
@@ -374,7 +640,7 @@ const ViewEngagementLogsModal = ({
 	const logs = data?.logs || [];
 
 	return (
-		<div className="fixed inset-0 z-[100] flex justify-end bg-black/40 backdrop-blur-sm animate-in fade-in duration-300">
+		<div className="fixed inset-0 z-100 flex justify-end bg-black/40 backdrop-blur-sm animate-in fade-in duration-300">
 			{/* Overlay click to close */}
 			<button
 				type="button"
@@ -488,7 +754,7 @@ const EditRemarksModal = ({
 	const [connectRemarks, setConnectRemarks] = useState(session.connectRemarks || "");
 
 	return (
-		<div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4">
+		<div className="fixed inset-0 z-100 flex items-center justify-center bg-black/50 p-4">
 			<div className="bg-white rounded-lg w-full max-w-md shadow-xl overflow-hidden border border-neutral-300">
 				<div className="p-6">
 					<div className="flex justify-between items-start mb-4">
@@ -558,7 +824,7 @@ const LogTouchpointModal = ({
 	const [remarks, setRemarks] = useState("");
 
 	return (
-		<div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4">
+		<div className="fixed inset-0 z-100 flex items-center justify-center bg-black/50 p-4">
 			<div className="bg-white rounded-lg w-full max-w-md shadow-xl overflow-hidden border border-neutral-300">
 				<div className="p-6">
 					<div className="flex justify-between items-start mb-4">

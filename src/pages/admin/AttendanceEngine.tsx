@@ -1,15 +1,18 @@
 import {
+	IconChevronDown,
+	IconChevronUp,
 	IconDatabase,
 	IconRefresh,
 	IconReload,
 	IconReport,
+	IconSearch,
 	IconSortAscending,
 	IconSortDescending,
 	IconTrendingUp,
 	IconX,
 } from "@tabler/icons-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
 	CartesianGrid,
 	Line,
@@ -31,6 +34,10 @@ export default function AttendanceEnginePage() {
 	const [activeCourseId, setActiveCourseId] = useState<string>(COURSE_IDS[0].toString());
 	const [lastSync, setLastSync] = useState<string>(new Date().toLocaleTimeString());
 	const [isGradeInsightsOpen, setIsGradeInsightsOpen] = useState(false);
+	const [searchQuery, setSearchQuery] = useState("");
+	const [isSearchVisible, setIsSearchVisible] = useState(false);
+	const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
+	const searchInputRef = useRef<HTMLInputElement>(null);
 
 	const [sessionOrder, setSessionOrder] = useState<"newest" | "oldest">(() => {
 		const saved = localStorage.getItem("ae_session_order");
@@ -40,10 +47,43 @@ export default function AttendanceEnginePage() {
 	const { data, isLoading, isError, refetch } = useAttendanceEngineReport(COURSE_IDS);
 	const syncMutation = useSyncAttendance();
 
+	// Calculate matches for navigation
+	const matches = useMemo(() => {
+		if (!searchQuery || !data?.sheets) return [];
+		const activeSheet = data.sheets.find((s) => s.courseId.toString() === activeCourseId);
+		if (!activeSheet) return [];
+
+		const results: { studentId: number; type: "name" | "phone" }[] = [];
+		activeSheet.students.forEach((student) => {
+			if (student.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+				results.push({ studentId: student.id, type: "name" });
+			}
+			if (student.phone.toLowerCase().includes(searchQuery.toLowerCase())) {
+				results.push({ studentId: student.id, type: "phone" });
+			}
+		});
+		return results;
+	}, [searchQuery, data, activeCourseId]);
+
+	useEffect(() => {
+		if (matches.length > 0) {
+			setCurrentMatchIndex(0);
+		} else {
+			setCurrentMatchIndex(-1);
+		}
+	}, [matches.length]);
+
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
+			if ((e.ctrlKey || e.metaKey) && e.key === "f") {
+				e.preventDefault();
+				setIsSearchVisible(true);
+				setTimeout(() => searchInputRef.current?.focus(), 50);
+			}
 			if (e.key === "Escape") {
 				setIsGradeInsightsOpen(false);
+				setIsSearchVisible(false);
+				setSearchQuery("");
 			}
 		};
 		window.addEventListener("keydown", handleKeyDown);
@@ -62,6 +102,16 @@ export default function AttendanceEnginePage() {
 		} catch (error) {
 			console.error("Sync failed", error);
 		}
+	};
+
+	const handleNextMatch = () => {
+		if (matches.length === 0) return;
+		setCurrentMatchIndex((prev) => (prev + 1) % matches.length);
+	};
+
+	const handlePrevMatch = () => {
+		if (matches.length === 0) return;
+		setCurrentMatchIndex((prev) => (prev - 1 + matches.length) % matches.length);
 	};
 
 	if (isLoading) {
@@ -113,6 +163,18 @@ export default function AttendanceEnginePage() {
 					</span>
 
 					<Button
+						onClick={() => setIsSearchVisible(!isSearchVisible)}
+						variant="outline"
+						size="sm"
+						className={cn(
+							"h-8 border-neutral-300 hover:bg-neutral-100 text-neutral-600 rounded-lg text-[11px] font-bold px-3 transition-all",
+							isSearchVisible && "bg-neutral-100 border-neutral-400",
+						)}
+					>
+						<IconSearch className="w-3.5 h-3.5 mr-1.5" /> Find
+					</Button>
+
+					<Button
 						onClick={() => setIsGradeInsightsOpen(true)}
 						variant="outline"
 						size="sm"
@@ -151,6 +213,56 @@ export default function AttendanceEnginePage() {
 						{syncMutation.isPending ? "Syncing..." : "Sync Data"}
 					</Button>
 				</div>
+
+				{/* Floating Google Sheets Style Search Box */}
+				{isSearchVisible && (
+					<div className="absolute top-14 right-4 z-100 bg-white shadow-2xl border border-neutral-200 rounded-lg p-2 flex items-center gap-1 animate-in slide-in-from-top-2 duration-200">
+						<div className="flex items-center border border-emerald-500 rounded px-2 bg-white h-9 min-w-[200px]">
+							<input
+								ref={searchInputRef}
+								type="text"
+								placeholder="Find in sheet"
+								value={searchQuery}
+								onChange={(e) => setSearchQuery(e.target.value)}
+								className="flex-1 outline-none text-sm h-full"
+							/>
+							{searchQuery && (
+								<span className="text-[11px] text-neutral-400 font-medium px-2 border-l border-neutral-200 ml-2">
+									{matches.length > 0 ? `${currentMatchIndex + 1} of ${matches.length}` : "0 of 0"}
+								</span>
+							)}
+						</div>
+						<div className="flex items-center relative">
+							<button
+								type="button"
+								onClick={handlePrevMatch}
+								className="p-1.5 hover:bg-neutral-100 rounded text-neutral-600"
+								title="Previous match"
+							>
+								<IconChevronUp className="w-4 h-4" />
+							</button>
+							<button
+								type="button"
+								onClick={handleNextMatch}
+								className="p-1.5 hover:bg-neutral-100 rounded text-neutral-600"
+								title="Next match"
+							>
+								<IconChevronDown className="w-4 h-4" />
+							</button>
+							<div className="w-px h-6 bg-neutral-200 mx-1" />
+							<button
+								type="button"
+								onClick={() => {
+									setIsSearchVisible(false);
+									setSearchQuery("");
+								}}
+								className="p-1.5 hover:bg-neutral-100 rounded text-neutral-600"
+							>
+								<IconX className="w-4 h-4" />
+							</button>
+						</div>
+					</div>
+				)}
 			</div>
 
 			{/* Main Spreadsheet Area */}
@@ -160,8 +272,8 @@ export default function AttendanceEnginePage() {
 						key={activeSheet.courseId}
 						sheet={activeSheet}
 						sessionOrder={sessionOrder}
-						searchQuery=""
-						currentMatch={null}
+						searchQuery={searchQuery}
+						currentMatch={matches[currentMatchIndex] || null}
 						targetDate={null}
 					/>
 				)}

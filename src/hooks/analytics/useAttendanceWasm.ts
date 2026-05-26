@@ -145,12 +145,12 @@ export const useAttendanceWasm = () => {
 				return { absentStudents: [] };
 			}
 
-			// Build a Set of joined student IDs (string comparison)
+			// Build a Set of joined userIDs — matched against enrolled student uuid
 			const joinedIdSet = new Set(joinedStudents.map((s) => s.userID));
 
 			// JS fallback (also used when WASM not loaded)
 			if (!wasmInstance) {
-				const absentStudents = allStudents.filter((s) => !joinedIdSet.has(String(s.id)));
+				const absentStudents = allStudents.filter((s) => !joinedIdSet.has(s.uuid));
 				return { absentStudents };
 			}
 
@@ -171,9 +171,9 @@ export const useAttendanceWasm = () => {
 
 			const mem = new Uint8Array(memory.buffer);
 
-			// Write flags: 1 = absent, 0 = present
+			// Write flags: 1 = absent, 0 = present (match on uuid, not numeric id)
 			for (let i = 0; i < studentCount; i++) {
-				mem[flagsOffset + i] = joinedIdSet.has(String(allStudents[i].id)) ? 0 : 1;
+				mem[flagsOffset + i] = joinedIdSet.has(allStudents[i].uuid) ? 0 : 1;
 			}
 
 			// Read results from WASM memory

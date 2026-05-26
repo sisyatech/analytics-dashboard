@@ -435,6 +435,22 @@ const LiveSessionMonitoring = ({
 		[enrolledData?.students, joinedStudents, computeAbsentStudents],
 	);
 
+	// DEBUG: compare enrolled vs joined IDs to verify absent filtering
+	console.log("=== Absent/Present Debug ===");
+	console.log(
+		"Enrolled students (uuid = match key):",
+		enrolledData?.students?.map((s) => ({ uuid: s.uuid, name: s.name })),
+	);
+	console.log(
+		"Joined students (userID = match key):",
+		joinedStudents.map((s) => ({ userID: s.userID, name: s.userName })),
+	);
+	console.log(
+		"Absent students (uuid not in joined userIDs):",
+		absentStudents.map((s) => ({ uuid: s.uuid, name: s.name })),
+	);
+	console.log("============================");
+
 	const toggleStudent = (id: string) => {
 		setExpandedStudentId((prev) => (prev === id ? null : id));
 	};

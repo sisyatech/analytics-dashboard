@@ -6,7 +6,7 @@ import {
 	getSessionAttendance,
 	markAsSisyaEmp,
 } from "@/api/attendance";
-import { getCoursePerformanceSessions } from "@/api/performance";
+import { getCoursePerformanceSessions, getStudentsByCourse } from "@/api/performance";
 
 export const useLiveSessionStudents = (sessionId: number | null) => {
 	return useQuery({
@@ -88,5 +88,17 @@ export const useMarkAsSisyaEmp = () => {
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["attendance"] });
 		},
+	});
+};
+
+export const useEnrolledStudentsByCourse = (courseId: number | null) => {
+	return useQuery({
+		queryKey: ["enrolled-students", courseId],
+		queryFn: () => {
+			if (!courseId) throw new Error("courseId is required");
+			return getStudentsByCourse(courseId);
+		},
+		enabled: Boolean(courseId),
+		staleTime: 1000 * 60 * 5, // 5 minutes — enrollment list is stable
 	});
 };

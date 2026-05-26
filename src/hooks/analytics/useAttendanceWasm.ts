@@ -1,7 +1,7 @@
 // biome-ignore-all lint/suspicious/noExplicitAny: wasm
 
 import { useCallback, useEffect, useState } from "react";
-import type { LiveSessionStudent } from "@/types/performance";
+import type { LiveSessionStudent, Student } from "@/types/performance";
 
 // Vite allows importing WASM files with ?url
 import wasmUrl from "../../wasm/attendance.wasm?url";
@@ -9,6 +9,10 @@ import wasmUrl from "../../wasm/attendance.wasm?url";
 export interface WasmResult {
 	joinedStudents: LiveSessionStudent[];
 	leftStudents: (LiveSessionStudent & { lastLeft: number })[];
+}
+
+export interface AbsentResult {
+	absentStudents: Student[];
 }
 
 export const useAttendanceWasm = () => {
@@ -128,5 +132,62 @@ export const useAttendanceWasm = () => {
 		[wasmInstance],
 	);
 
-	return { processStudents, isLoadingWasm: isLoading };
+	/**
+	 * Computes absent students by diffing all enrolled students against joined IDs.
+	 *
+	 * WASM path: writes joined IDs into memory as a lookup table (1 byte per slot),
+	 * then scans all students to build the absent list — same memory-buffer approach.
+	 * Falls back to a JS Set if WASM is not yet loaded.
+	 */
+	const computeAbsentStudents = useCallback(
+		(allStudents: Student[] | undefined, joinedStudents: LiveSessionStudent[]): AbsentResult => {
+			if (!allStudents || allStudents.length === 0) {
+				return { absentStudents: [] };
+			}
+
+			// Build a Set of joined student IDs (string comparison)
+			const joinedIdSet = new Set(joinedStudents.map((s) => s.userID));
+
+			// JS fallback (also used when WASM not loaded)
+			if (!wasmInstance) {
+				const absentStudents = allStudents.filter((s) => !joinedIdSet.has(String(s.id)));
+				return { absentStudents };
+			}
+
+			// WASM-memory path: use the shared memory buffer for the filtering loop
+			const { memory } = wasmInstance.exports;
+			const studentCount = allStudents.length;
+
+			// Memory layout:
+			// 0 - 1024: Reserved (same as processAttendance)
+			// 1024: absentFlags (studentCount * 1 byte — 1 = absent, 0 = present)
+			const flagsOffset = 1024;
+			const totalNeeded = flagsOffset + studentCount;
+
+			if (totalNeeded > memory.buffer.byteLength) {
+				const neededPages = Math.ceil((totalNeeded - memory.buffer.byteLength) / 65536);
+				memory.grow(neededPages);
+			}
+
+			const mem = new Uint8Array(memory.buffer);
+
+			// Write flags: 1 = absent, 0 = present
+			for (let i = 0; i < studentCount; i++) {
+				mem[flagsOffset + i] = joinedIdSet.has(String(allStudents[i].id)) ? 0 : 1;
+			}
+
+			// Read results from WASM memory
+			const absentStudents: Student[] = [];
+			for (let i = 0; i < studentCount; i++) {
+				if (mem[flagsOffset + i] === 1) {
+					absentStudents.push(allStudents[i]);
+				}
+			}
+
+			return { absentStudents };
+		},
+		[wasmInstance],
+	);
+
+	return { processStudents, computeAbsentStudents, isLoadingWasm: isLoading };
 };

@@ -13,6 +13,7 @@ import {
 	IconRefresh,
 	IconSchool,
 	IconUsers,
+	IconUserX,
 	IconX,
 } from "@tabler/icons-react";
 import { AnimatePresence, motion } from "motion/react";
@@ -27,13 +28,17 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { GRADES } from "@/constants";
-import { useCoursesByGrade, useLiveSessionStudents } from "@/hooks/analytics/useAttendance";
+import {
+	useCoursesByGrade,
+	useEnrolledStudentsByCourse,
+	useLiveSessionStudents,
+} from "@/hooks/analytics/useAttendance";
 import { useAttendanceWasm } from "@/hooks/analytics/useAttendanceWasm";
 import { type ChatMessage, useLiveAttendance } from "@/hooks/analytics/useLiveAttendance";
 import { useOngoingSessionsByCourse } from "@/hooks/analytics/useOngoingSessions";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
-import type { LiveSessionStudent, OngoingSessionByCourse } from "@/types/performance";
+import type { LiveSessionStudent, OngoingSessionByCourse, Student } from "@/types/performance";
 
 const STORAGE_KEY = "live-status-state";
 
@@ -400,12 +405,17 @@ const LiveSessionMonitoring = ({
 		session.id,
 		session.vmIp || undefined,
 	);
+	console.log(students);
 	const { data: polledData, refetch, isRefetching } = useLiveSessionStudents(session.id);
-	const { processStudents } = useAttendanceWasm();
+	const { processStudents, computeAbsentStudents } = useAttendanceWasm();
 	const [isSheetOpen, setIsSheetOpen] = useState(false);
-	const [syncTab, setSyncTab] = useState<"joined" | "left">("joined");
+	const [syncTab, setSyncTab] = useState<"joined" | "left" | "absent">("joined");
 	const [expandedStudentId, setExpandedStudentId] = useState<string | null>(null);
 	const [isPipOpen, setIsPipOpen] = useState(false);
+	const [selectedCourseId] = useState<number | null>(() => {
+		const raw = sessionStorage.getItem("live-status-state");
+		return raw ? JSON.parse(raw).courseId : null;
+	});
 
 	const { joinedStudents, leftStudents } = useMemo(() => {
 		const result = processStudents(polledData?.students);
@@ -414,6 +424,16 @@ const LiveSessionMonitoring = ({
 			leftStudents: [...result.leftStudents].sort((a, b) => b.lastLeft - a.lastLeft),
 		};
 	}, [polledData?.students, processStudents]);
+
+	const { data: enrolledData } = useEnrolledStudentsByCourse(
+		session.id > 0 ? selectedCourseId : null,
+	);
+
+	// Compute absent students: enrolled list minus joined (present) students — via WASM memory buffers
+	const { absentStudents } = useMemo(
+		() => computeAbsentStudents(enrolledData?.students, joinedStudents),
+		[enrolledData?.students, joinedStudents, computeAbsentStudents],
+	);
 
 	const toggleStudent = (id: string) => {
 		setExpandedStudentId((prev) => (prev === id ? null : id));
@@ -478,6 +498,7 @@ const LiveSessionMonitoring = ({
 					isConnected={isConnected}
 					joinedStudents={joinedStudents}
 					leftStudents={leftStudents}
+					absentStudents={absentStudents}
 					refetch={refetch}
 					isRefetching={isRefetching}
 					sessionDetail={session.detail}
@@ -504,6 +525,11 @@ const LiveSessionMonitoring = ({
 								>
 									<IconRefresh className="w-3.5 h-3.5" />
 									View Server Sync
+									{absentStudents.length > 0 && (
+										<span className="ml-1 px-1.5 py-0.5 rounded-md bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 text-[10px] font-black">
+											{absentStudents.length} absent
+										</span>
+									)}
 								</button>
 							</div>
 						</div>
@@ -649,83 +675,123 @@ const LiveSessionMonitoring = ({
 													{leftStudents.length}
 												</span>
 											</button>
+											<button
+												type="button"
+												onClick={() => setSyncTab("absent")}
+												className={cn(
+													"flex-1 flex items-center justify-center gap-2 py-2 text-xs font-bold transition-all relative z-10",
+													syncTab === "absent"
+														? "text-amber-600 dark:text-amber-400"
+														: "text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300",
+												)}
+											>
+												<IconUserX className="w-4 h-4" />
+												Absent
+												<span
+													className={cn(
+														"px-1.5 py-0.5 rounded-md text-[10px]",
+														syncTab === "absent"
+															? "bg-amber-100 dark:bg-amber-900/40"
+															: "bg-neutral-100 dark:bg-neutral-900",
+													)}
+												>
+													{absentStudents.length}
+												</span>
+											</button>
 											<motion.div
 												layoutId="syncTabIndicator"
 												className={cn(
 													"absolute inset-y-1 rounded-lg bg-neutral-50 dark:bg-neutral-900/50 border border-neutral-100 dark:border-neutral-700 shadow-sm",
-													syncTab === "joined" ? "left-1" : "left-1/2",
+													syncTab === "joined"
+														? "left-1"
+														: syncTab === "left"
+															? "left-1/3"
+															: "left-2/3",
 												)}
-												style={{ width: "calc(50% - 4px)" }}
+												style={{ width: "calc(33.333% - 4px)" }}
 												transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
 											/>
 										</div>
 									</div>
 
-									<div className="flex-1 overflow-y-auto p-4">
-										{syncTab === "joined" ? (
-											joinedStudents.length === 0 ? (
-												<div className="py-20 flex flex-col items-center justify-center text-center gap-4 border border-dashed border-neutral-200 dark:border-neutral-800 rounded-2xl mx-2 bg-white dark:bg-neutral-900/50">
-													<div className="w-16 h-16 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
-														<IconUsers className="w-8 h-8 text-neutral-400" />
-													</div>
-													<div className="space-y-1">
-														<p className="text-sm font-bold text-neutral-800 dark:text-neutral-200">
-															No Synced Students
-														</p>
-														<p className="text-xs text-neutral-500 px-8">
-															Waiting for active participation data from the server.
-														</p>
-													</div>
+									<div className="flex-1 overflow-y-auto p-4 space-y-2">
+										<div className="flex items-center justify-between mb-2">
+											<span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">
+												{syncTab === "joined"
+													? "Synced Students"
+													: syncTab === "left"
+														? "Disconnected Students"
+														: "Absent Students"}
+											</span>
+											<button
+												type="button"
+												onClick={() => refetch()}
+												disabled={isRefetching}
+												className="p-1 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-md"
+											>
+												<IconRefresh
+													className={cn("w-3 h-3 text-neutral-500", isRefetching && "animate-spin")}
+												/>
+											</button>
+										</div>
+
+										{syncTab === "absent" ? (
+											absentStudents.length === 0 ? (
+												<div className="py-12 flex flex-col items-center text-center opacity-50">
+													<IconUserX className="w-8 h-8 text-amber-400 mb-2" />
+													<p className="text-xs font-medium">All students present!</p>
 												</div>
 											) : (
-												<div className="space-y-3">
-													{joinedStudents.map((student) => {
-														const isExpanded = expandedStudentId === student.userID;
-														return (
-															<div
-																key={student.userID}
-																className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden transition-all"
-															>
-																<SyncStudentItem
-																	student={student}
-																	isExpanded={isExpanded}
-																	onToggle={() => toggleStudent(student.userID)}
-																/>
+												<div className="space-y-2">
+													{absentStudents.map((student) => (
+														<div
+															key={student.id}
+															className="flex items-center gap-3 p-3 bg-white dark:bg-neutral-800 rounded-xl border border-amber-100 dark:border-amber-900/30"
+														>
+															<div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 flex items-center justify-center text-sm font-bold shrink-0">
+																{student.name.charAt(0).toUpperCase()}
 															</div>
-														);
-													})}
+															<div className="flex flex-col flex-1 min-w-0">
+																<span className="text-xs font-bold text-neutral-800 dark:text-neutral-200 truncate">
+																	{student.name}
+																</span>
+																<span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400">
+																	Phone Number: {student.phone}
+																</span>
+															</div>
+														</div>
+													))}
 												</div>
 											)
-										) : leftStudents.length === 0 ? (
-											<div className="py-20 flex flex-col items-center justify-center text-center gap-4 border border-dashed border-neutral-200 dark:border-neutral-800 rounded-2xl mx-2 bg-white dark:bg-neutral-900/50">
-												<div className="w-16 h-16 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
-													<IconClock className="w-8 h-8 text-neutral-400" />
-												</div>
-												<div className="space-y-1">
-													<p className="text-sm font-bold text-neutral-800 dark:text-neutral-200">
-														None have left yet
-													</p>
-													<p className="text-xs text-neutral-500 px-8">
-														Students who exit the session will appear here with their departure
-														time.
-													</p>
-												</div>
+										) : (syncTab === "joined" ? joinedStudents : leftStudents).length === 0 ? (
+											<div className="py-12 flex flex-col items-center text-center opacity-50">
+												{syncTab === "joined" ? (
+													<IconUsers className="w-8 h-8 text-neutral-400 mb-2" />
+												) : (
+													<IconClock className="w-8 h-8 text-neutral-400 mb-2" />
+												)}
+												<p className="text-xs font-medium">
+													{syncTab === "joined" ? "No server data" : "No students left"}
+												</p>
 											</div>
 										) : (
-											<div className="space-y-3">
-												{leftStudents.map((student) => {
+											<div className="space-y-2">
+												{(syncTab === "joined" ? joinedStudents : leftStudents).map((student) => {
 													const isExpanded = expandedStudentId === student.userID;
 													return (
 														<div
 															key={student.userID}
-															className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden transition-all grayscale opacity-80"
+															className={cn(
+																"bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden",
+																syncTab === "left" && "opacity-80 grayscale",
+															)}
 														>
 															<SyncStudentItem
 																student={student}
 																isExpanded={isExpanded}
 																onToggle={() => toggleStudent(student.userID)}
-																isLeft
-																lastLeft={student.lastLeft}
+																isLeft={syncTab === "left"}
+																lastLeft={(student as any).lastLeft}
 															/>
 														</div>
 													);
@@ -755,6 +821,7 @@ interface PiPViewProps {
 	isConnected: boolean;
 	joinedStudents: LiveSessionStudent[];
 	leftStudents: (LiveSessionStudent & { lastLeft: number })[];
+	absentStudents: Student[];
 	refetch: () => void;
 	isRefetching: boolean;
 	sessionDetail: string;
@@ -767,12 +834,13 @@ const PiPView = ({
 	isConnected,
 	joinedStudents,
 	leftStudents,
+	absentStudents,
 	refetch,
 	isRefetching,
 	sessionDetail,
 }: PiPViewProps) => {
 	const [activeTab, setActiveTab] = useState<"participants" | "chat" | "server">("participants");
-	const [syncTab, setSyncTab] = useState<"joined" | "left">("joined");
+	const [syncTab, setSyncTab] = useState<"joined" | "left" | "absent">("joined");
 	const [expandedStudentId, setExpandedStudentId] = useState<string | null>(null);
 
 	const toggleStudent = (id: string) => {
@@ -836,6 +904,11 @@ const PiPView = ({
 					)}
 				>
 					<IconRefresh className="w-4 h-4" /> Server Sync
+					{absentStudents.length > 0 && (
+						<span className="ml-0.5 px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 text-[10px] font-black">
+							{absentStudents.length}
+						</span>
+					)}
 				</button>
 			</div>
 
@@ -908,12 +981,24 @@ const PiPView = ({
 								>
 									Left ({leftStudents.length})
 								</button>
+								<button
+									type="button"
+									onClick={() => setSyncTab("absent")}
+									className={cn(
+										"flex-1 flex items-center justify-center gap-2 py-2 text-[10px] font-bold transition-all relative z-10",
+										syncTab === "absent"
+											? "text-amber-600 dark:text-amber-400"
+											: "text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300",
+									)}
+								>
+									Absent ({absentStudents.length})
+								</button>
 								<motion.div
 									className={cn(
 										"absolute inset-y-1 rounded-lg bg-neutral-50 dark:bg-neutral-900/50 border border-neutral-100 dark:border-neutral-700 shadow-sm",
-										syncTab === "joined" ? "left-1" : "left-1/2",
+										syncTab === "joined" ? "left-1" : syncTab === "left" ? "left-1/3" : "left-2/3",
 									)}
-									style={{ width: "calc(50% - 4px)" }}
+									style={{ width: "calc(33.333% - 4px)" }}
 								/>
 							</div>
 						</div>
@@ -921,7 +1006,11 @@ const PiPView = ({
 						<div className="flex-1 overflow-y-auto p-4 space-y-2">
 							<div className="flex items-center justify-between mb-2">
 								<span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">
-									{syncTab === "joined" ? "Synced Students" : "Disconnected Students"}
+									{syncTab === "joined"
+										? "Synced Students"
+										: syncTab === "left"
+											? "Disconnected Students"
+											: "Absent Students"}
 								</span>
 								<button
 									type="button"
@@ -935,7 +1024,35 @@ const PiPView = ({
 								</button>
 							</div>
 
-							{(syncTab === "joined" ? joinedStudents : leftStudents).length === 0 ? (
+							{syncTab === "absent" ? (
+								absentStudents.length === 0 ? (
+									<div className="py-12 flex flex-col items-center text-center opacity-50">
+										<IconUserX className="w-8 h-8 text-amber-400 mb-2" />
+										<p className="text-xs font-medium">All students present!</p>
+									</div>
+								) : (
+									<div className="space-y-2">
+										{absentStudents.map((student) => (
+											<div
+												key={student.id}
+												className="flex items-center gap-3 p-3 bg-white dark:bg-neutral-800 rounded-xl border border-amber-100 dark:border-amber-900/30"
+											>
+												<div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 flex items-center justify-center text-sm font-bold shrink-0">
+													{student.name.charAt(0).toUpperCase()}
+												</div>
+												<div className="flex flex-col flex-1 min-w-0">
+													<span className="text-xs font-bold text-neutral-800 dark:text-neutral-200 truncate">
+														{student.name}
+													</span>
+													<span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400">
+														Phone Number: {student.phone}
+													</span>
+												</div>
+											</div>
+										))}
+									</div>
+								)
+							) : (syncTab === "joined" ? joinedStudents : leftStudents).length === 0 ? (
 								<div className="py-12 flex flex-col items-center text-center opacity-50">
 									{syncTab === "joined" ? (
 										<IconUsers className="w-8 h-8 text-neutral-400 mb-2" />

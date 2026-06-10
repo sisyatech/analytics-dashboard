@@ -1,4 +1,5 @@
 import {
+	IconArrowLeft,
 	IconChevronDown,
 	IconChevronUp,
 	IconDatabase,
@@ -28,10 +29,31 @@ import { Button } from "@/components/ui/button";
 import { useAttendanceEngineReport, useSyncAttendance } from "@/hooks/admin/useAttendanceEngine";
 import { cn } from "@/lib/utils";
 
-const COURSE_IDS = [302, 303, 304, 305, 306, 307, 308, 309, 310, 311];
+const PROGRAMS = [
+	{
+		id: "topper",
+		name: "Topper Program",
+		courseIds: [446, 447, 448, 450, 451, 453, 454, 456, 457, 458],
+		isActive: true,
+	},
+	{
+		id: "mathchamp",
+		name: "Math Champ",
+		courseIds: [435, 436, 437, 438, 439, 440, 441, 442, 443, 444],
+		isActive: true,
+	},
+	{ id: "jee", name: "JEE Foundation Elite Batch", courseIds: [460], isActive: true },
+	{
+		id: "summercamp",
+		name: "Summer Camp",
+		courseIds: [302, 303, 304, 305, 306, 307, 308, 309, 310, 311],
+		isActive: false,
+	},
+];
 
 export default function AttendanceEnginePage() {
-	const [activeCourseId, setActiveCourseId] = useState<string>(COURSE_IDS[0].toString());
+	const [selectedProgram, setSelectedProgram] = useState<(typeof PROGRAMS)[0] | null>(null);
+	const [activeCourseId, setActiveCourseId] = useState<string>("");
 	const [lastSync, setLastSync] = useState<string>(new Date().toLocaleTimeString());
 	const [isGradeInsightsOpen, setIsGradeInsightsOpen] = useState(false);
 	const [searchQuery, setSearchQuery] = useState("");
@@ -44,7 +66,9 @@ export default function AttendanceEnginePage() {
 		return (saved as "newest" | "oldest") || "oldest";
 	});
 
-	const { data, isLoading, isError, refetch } = useAttendanceEngineReport(COURSE_IDS);
+	const { data, isLoading, isError, refetch } = useAttendanceEngineReport(
+		selectedProgram ? selectedProgram.courseIds : [],
+	);
 	const syncMutation = useSyncAttendance();
 
 	// Calculate matches for navigation
@@ -95,8 +119,11 @@ export default function AttendanceEnginePage() {
 	}, [sessionOrder]);
 
 	const handleSyncAll = async () => {
+		if (!selectedProgram) return;
 		try {
-			await Promise.all(COURSE_IDS.map((id) => syncMutation.mutateAsync({ courseId: id })));
+			await Promise.all(
+				selectedProgram.courseIds.map((id) => syncMutation.mutateAsync({ courseId: id })),
+			);
 			setLastSync(new Date().toLocaleTimeString());
 			refetch();
 		} catch (error) {
@@ -123,7 +150,7 @@ export default function AttendanceEnginePage() {
 						Initializing Attendance Engine
 					</p>
 					<p className="text-neutral-400 text-sm">
-						Crunching data for {COURSE_IDS.length} grades...
+						Crunching data for {selectedProgram?.courseIds.length || 0} grades...
 					</p>
 				</div>
 			</div>
@@ -144,16 +171,123 @@ export default function AttendanceEnginePage() {
 	const sheets = data?.sheets || [];
 	const activeSheet = sheets.find((s) => s.courseId.toString() === activeCourseId);
 
+	if (!selectedProgram) {
+		return (
+			<div className="h-[calc(100vh-2rem)] flex flex-col items-start justify-start bg-[#f8f9fa] -m-4 md:-m-8 p-6 md:p-8 overflow-auto">
+				<div className="max-w-4xl w-full space-y-8 mt-0">
+					<div className="flex items-center gap-4">
+						<div className="w-14 h-14 bg-emerald-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-600/20">
+							<IconDatabase className="w-7 h-7 text-white" />
+						</div>
+						<div>
+							<h1 className="text-3xl font-bold text-neutral-900 tracking-tight">
+								Attendance Engine
+							</h1>
+							<p className="text-neutral-500 mt-1 font-medium">
+								Select a program to view its records
+							</p>
+						</div>
+					</div>
+
+					<div className="flex flex-col gap-4">
+						{PROGRAMS.map((program) => (
+							<button
+								key={program.id}
+								type="button"
+								onClick={() => {
+									setSelectedProgram(program);
+									setActiveCourseId(program.courseIds[0].toString());
+								}}
+								className={cn(
+									"flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 rounded-2xl border transition-all duration-200 group text-left w-full gap-4 sm:gap-0",
+									program.isActive
+										? "bg-white border-neutral-200 hover:border-emerald-500 hover:shadow-lg"
+										: "bg-red-50/40 border-red-100/60 hover:border-red-300 hover:shadow-md opacity-90",
+								)}
+							>
+								<div className="flex items-center gap-4">
+									<div
+										className={cn(
+											"w-12 h-12 rounded-full flex items-center justify-center transition-colors shrink-0",
+											program.isActive
+												? "bg-emerald-50 group-hover:bg-emerald-100 text-emerald-600"
+												: "bg-red-100/50 group-hover:bg-red-100 text-red-500",
+										)}
+									>
+										<span className="font-black text-xl">{program.name.charAt(0)}</span>
+									</div>
+									<div>
+										<div className="flex items-center gap-2">
+											<h3
+												className={cn(
+													"text-lg font-bold transition-colors",
+													program.isActive
+														? "text-neutral-800 group-hover:text-emerald-700"
+														: "text-neutral-700 group-hover:text-red-700",
+												)}
+											>
+												{program.name}
+											</h3>
+											{!program.isActive && (
+												<span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-red-100 text-red-600 border border-red-200">
+													Inactive
+												</span>
+											)}
+										</div>
+										<p className="text-sm text-neutral-400 mt-0.5">
+											View attendance and engagement records
+										</p>
+									</div>
+								</div>
+
+								<div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+									<span
+										className={cn(
+											"text-[13px] font-medium px-3 py-1.5 rounded-full border",
+											program.isActive
+												? "text-neutral-500 bg-neutral-50 border-neutral-100"
+												: "text-red-400 bg-red-50/50 border-red-100",
+										)}
+									>
+										{program.courseIds.length} course{program.courseIds.length !== 1 ? "s" : ""}
+									</span>
+									<div
+										className={cn(
+											"w-8 h-8 rounded-full flex items-center justify-center transition-colors",
+											program.isActive
+												? "bg-neutral-50 group-hover:bg-emerald-50 group-hover:text-emerald-600 text-neutral-400"
+												: "bg-red-50/50 group-hover:bg-red-50 group-hover:text-red-500 text-red-300",
+										)}
+									>
+										<IconChevronDown className="w-4 h-4 -rotate-90" />
+									</div>
+								</div>
+							</button>
+						))}
+					</div>
+				</div>
+			</div>
+		);
+	}
+
 	return (
 		<div className="h-screen flex flex-col bg-[#f8f9fa] -m-4 md:-m-8 overflow-hidden">
 			{/* Top Bar - Mini */}
 			<div className="h-12 bg-white border-b border-neutral-200 flex items-center justify-between px-4 shrink-0 relative z-50">
 				<div className="flex items-center gap-3">
+					<button
+						type="button"
+						onClick={() => setSelectedProgram(null)}
+						className="p-1.5 hover:bg-neutral-100 rounded-lg text-neutral-500 transition-colors mr-1"
+						title="Back to Programs"
+					>
+						<IconArrowLeft className="w-5 h-5" />
+					</button>
 					<div className="w-8 h-8 bg-emerald-600 rounded flex items-center justify-center">
 						<IconDatabase className="w-5 h-5 text-white" />
 					</div>
-					<h1 className="text-lg font-medium text-neutral-700">
-						Attendance Engine - Summer Camp 2024
+					<h1 className="text-lg font-medium text-neutral-700 truncate max-w-[300px]">
+						Attendance Engine - {selectedProgram.name}
 					</h1>
 				</div>
 

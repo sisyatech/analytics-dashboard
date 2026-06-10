@@ -40,6 +40,7 @@ export const SpreadsheetView = ({
 	const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
 	const [selectedSession, setSelectedSession] = useState<Session | null>(null);
 	const [isRemarksModalOpen, setIsRemarksModalOpen] = useState(false);
+	const [isTeacherRemarkModalOpen, setIsTeacherRemarkModalOpen] = useState(false);
 	const [isLogModalOpen, setIsLogModalOpen] = useState(false);
 	const [isLogsViewModalOpen, setIsLogsViewModalOpen] = useState(false);
 	const [selectedSessionForInsights, setSelectedSessionForInsights] = useState<{
@@ -150,7 +151,7 @@ export const SpreadsheetView = ({
 						{sortedSessions.map((session) => (
 							<th
 								key={`date-${session.id}`}
-								colSpan={4}
+								colSpan={5}
 								className="border-r border-b border-neutral-300 p-0 text-center bg-[#e2f3e7] text-neutral-800 font-bold ae-date-header group/date"
 							>
 								<button
@@ -183,8 +184,11 @@ export const SpreadsheetView = ({
 								<th className="border-r border-neutral-300 p-1 w-12 text-neutral-600 font-medium">
 									HW
 								</th>
-								<th className="border-r border-neutral-300 p-1 w-48 text-neutral-600 font-medium text-left px-2">
-									Remark
+								<th className="border-r border-neutral-300 p-1 w-40 text-neutral-600 font-medium text-left px-2">
+									Connect
+								</th>
+								<th className="border-r border-neutral-300 p-1 w-40 text-neutral-600 font-medium text-left px-2">
+									Teacher
 								</th>
 							</Fragment>
 						))}
@@ -285,6 +289,7 @@ export const SpreadsheetView = ({
 											<td className="border-r border-neutral-300 bg-neutral-50" />
 											<td className="border-r border-neutral-300 bg-neutral-50" />
 											<td className="border-r border-neutral-300 bg-neutral-50" />
+											<td className="border-r border-neutral-300 bg-neutral-50" />
 										</Fragment>
 									);
 
@@ -315,7 +320,7 @@ export const SpreadsheetView = ({
 										<td className="border-r border-neutral-300 text-center text-neutral-500 bg-white py-1">
 											{session.hw?.toUpperCase() === "DONE" ? "Done" : "-"}
 										</td>
-										{/* Remark */}
+										{/* Connect Remark */}
 										<td className="border-r border-neutral-300 px-2 py-1 text-neutral-700 bg-white truncate group/remark relative">
 											<div className="flex items-center justify-between gap-1 w-full h-full">
 												<span className="truncate flex-1">{session.connectRemarks || "-"}</span>
@@ -328,6 +333,20 @@ export const SpreadsheetView = ({
 												</button>
 											</div>
 										</td>
+										{/* Teacher Remark */}
+										<td className="border-r border-neutral-300 p-0 text-neutral-700 bg-white truncate relative group/teacher-remark transition-colors">
+											<button
+												type="button"
+												className="flex items-center justify-between gap-1 w-full h-full cursor-pointer hover:bg-neutral-50 px-2 py-1 focus:outline-none text-left"
+												onClick={() => {
+													setSelectedStudent(student);
+													setSelectedSession(session);
+													setIsTeacherRemarkModalOpen(true);
+												}}
+											>
+												<span className="truncate flex-1">{session.teacherRemarks || "-"}</span>
+											</button>
+										</td>
 									</Fragment>
 								);
 							})}
@@ -337,6 +356,14 @@ export const SpreadsheetView = ({
 			</table>
 
 			{/* Modals */}
+			{isTeacherRemarkModalOpen && selectedStudent && selectedSession && (
+				<ViewTeacherRemarkModal
+					student={selectedStudent}
+					session={selectedSession}
+					onClose={() => setIsTeacherRemarkModalOpen(false)}
+				/>
+			)}
+
 			{isRemarksModalOpen && selectedStudent && selectedSession && (
 				<EditRemarksModal
 					student={selectedStudent}
@@ -802,6 +829,55 @@ const EditRemarksModal = ({
 						className="bg-emerald-600 hover:bg-emerald-700 text-white rounded px-6 h-9 text-sm"
 					>
 						{isLoading ? "Saving..." : "Save Remarks"}
+					</Button>
+				</div>
+			</div>
+		</div>
+	);
+};
+
+const ViewTeacherRemarkModal = ({
+	student,
+	session,
+	onClose,
+}: {
+	student: Student;
+	session: Session;
+	onClose: () => void;
+}) => {
+	return (
+		<div className="fixed inset-0 z-100 flex items-center justify-center bg-black/50 p-4">
+			<div className="bg-white rounded-lg w-full max-w-md shadow-xl overflow-hidden border border-neutral-300">
+				<div className="p-6">
+					<div className="flex justify-between items-start mb-4">
+						<div>
+							<h3 className="text-lg font-bold text-neutral-900">Teacher Remarks</h3>
+							<p className="text-sm text-neutral-500">
+								{student.name} · {session.topic || "Session"}
+							</p>
+						</div>
+						<button
+							type="button"
+							onClick={onClose}
+							className="p-1 hover:bg-neutral-100 rounded transition-colors"
+						>
+							<IconX className="w-5 h-5 text-neutral-400" />
+						</button>
+					</div>
+
+					<div className="space-y-4">
+						<div className="p-4 rounded-lg bg-neutral-50 border border-neutral-200 min-h-[100px] whitespace-pre-wrap text-sm text-neutral-700">
+							{session.teacherRemarks || "No remarks provided."}
+						</div>
+					</div>
+				</div>
+
+				<div className="px-6 py-4 bg-neutral-50 border-t border-neutral-200 flex justify-end gap-3">
+					<Button
+						onClick={onClose}
+						className="rounded px-6 h-9 text-sm bg-neutral-900 hover:bg-black text-white"
+					>
+						Close
 					</Button>
 				</div>
 			</div>

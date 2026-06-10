@@ -209,7 +209,25 @@ export const SpreadsheetView = ({
 								)}
 							>
 								<div className="flex items-center justify-between gap-1">
-									<span className="truncate flex-1">{student.name}</span>
+									<div className="flex items-center gap-2 truncate flex-1">
+										<span className="truncate">{student.name}</span>
+										{student.subscription && (
+											<div className="flex shrink-0">
+												{student.subscription.isLimitedAccess ? (
+													<span className="text-[9px] font-bold text-rose-600 bg-rose-50 px-1 py-0.5 rounded border border-rose-100 whitespace-nowrap">
+														Low Tier
+													</span>
+												) : student.subscription.bundleName ? (
+													<span
+														className="text-[9px] font-bold text-blue-600 bg-blue-50 px-1 py-0.5 rounded border border-blue-100 whitespace-nowrap max-w-[80px] truncate"
+														title={student.subscription.bundleName}
+													>
+														{student.subscription.bundleName}
+													</span>
+												) : null}
+											</div>
+										)}
+									</div>
 									<button
 										type="button"
 										onClick={() => {

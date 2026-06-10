@@ -19,6 +19,11 @@ export interface AttendanceEngineSheet {
 			status: string;
 			remarks: string;
 		};
+		subscription: {
+			isFullCourse: boolean;
+			isLimitedAccess: boolean;
+			bundleName: string | null;
+		} | null;
 		sessions: {
 			sessionId: number;
 			date: string;

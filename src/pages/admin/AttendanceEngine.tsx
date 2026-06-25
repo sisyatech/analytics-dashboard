@@ -1,5 +1,6 @@
 import {
 	IconArrowLeft,
+	IconChartBar,
 	IconChevronDown,
 	IconChevronUp,
 	IconDatabase,
@@ -24,6 +25,7 @@ import {
 	YAxis,
 } from "recharts";
 import type { AttendanceEngineSheet } from "@/api/attendanceEngine";
+import { DateRangeInsightsModal } from "@/components/admin/AttendanceEngine/DateRangeInsightsModal";
 import { SpreadsheetView } from "@/components/admin/AttendanceEngine/SpreadsheetView";
 import { Button } from "@/components/ui/button";
 import { useAttendanceEngineReport, useSyncAttendance } from "@/hooks/admin/useAttendanceEngine";
@@ -56,6 +58,7 @@ export default function AttendanceEnginePage() {
 	const [activeCourseId, setActiveCourseId] = useState<string>("");
 	const [lastSync, setLastSync] = useState<string>(new Date().toLocaleTimeString());
 	const [isGradeInsightsOpen, setIsGradeInsightsOpen] = useState(false);
+	const [isDateInsightsOpen, setIsDateInsightsOpen] = useState(false);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [isSearchVisible, setIsSearchVisible] = useState(false);
 	const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
@@ -318,6 +321,15 @@ export default function AttendanceEnginePage() {
 					</Button>
 
 					<Button
+						onClick={() => setIsDateInsightsOpen(true)}
+						variant="outline"
+						size="sm"
+						className="h-8 border-purple-100 bg-purple-50 text-purple-700 hover:bg-purple-100 rounded-lg text-[11px] font-bold px-3 transition-all"
+					>
+						<IconChartBar className="w-3.5 h-3.5 mr-1.5" /> Custom Report
+					</Button>
+
+					<Button
 						onClick={() => setSessionOrder((prev) => (prev === "oldest" ? "newest" : "oldest"))}
 						variant="outline"
 						size="sm"
@@ -440,6 +452,15 @@ export default function AttendanceEnginePage() {
 			<AnimatePresence>
 				{isGradeInsightsOpen && activeSheet && (
 					<GradeInsightsSheet sheet={activeSheet} onClose={() => setIsGradeInsightsOpen(false)} />
+				)}
+			</AnimatePresence>
+
+			<AnimatePresence>
+				{isDateInsightsOpen && activeSheet && (
+					<DateRangeInsightsModal
+						sheet={activeSheet}
+						onClose={() => setIsDateInsightsOpen(false)}
+					/>
 				)}
 			</AnimatePresence>
 		</div>
